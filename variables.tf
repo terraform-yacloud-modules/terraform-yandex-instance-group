@@ -4,7 +4,9 @@
 variable "folder_id" {
   description = "Folder ID"
   type        = string
+  default     = null
 }
+
 variable "zones" {
   description = "A list of availability zones"
   type        = list(string)
@@ -267,8 +269,9 @@ variable "service_account_id" {
 }
 
 variable "generate_ssh_key" {
-  type    = string
-  default = true
+  description = "If true, SSH key will be generated for instance group"
+  type        = string
+  default     = true
 }
 
 variable "ssh_user" {

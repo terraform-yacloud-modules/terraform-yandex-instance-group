@@ -6,6 +6,8 @@ locals {
       data.yandex_compute_image.this.id
   ))
   ssh_keys = var.generate_ssh_key ? "${var.ssh_user}:${tls_private_key.this[0].public_key_openssh}" : (var.ssh_pubkey != null ? "${var.ssh_user}:${file(var.ssh_pubkey)}" : null)
+
+  folder_id = var.folder_id == null ? data.yandex_client_config.client.folder_id : var.folder_id
 }
 
 resource "tls_private_key" "this" {
@@ -17,7 +19,7 @@ resource "tls_private_key" "this" {
 resource "yandex_compute_instance_group" "this" {
   name        = var.name
   description = var.instance_group_description
-  folder_id   = var.folder_id
+  folder_id   = local.folder_id
   labels      = var.labels
   variables   = var.variables
 
@@ -29,7 +31,8 @@ resource "yandex_compute_instance_group" "this" {
     description = var.instance_description
     labels      = var.labels
 
-    hostname = var.hostname
+    hostname           = var.hostname
+    service_account_id = var.service_account_id
 
     metadata = {
       serial-port-enable = var.serial_port_enable ? 1 : null
