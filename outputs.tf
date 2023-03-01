@@ -28,5 +28,5 @@ output "ssh_key_prv" {
 
 output "target_group_id" {
   description = "Target group ID"
-  value       = var.enable_nlb_integration || var.enable_alb_integration ? yandex_compute_instance_group.this.load_balancer.0.target_group_id : null
+  value       = var.enable_nlb_integration || var.enable_alb_integration ? yandex_compute_instance_group.this.load_balancer[0].target_group_id : yandex_compute_instance_group.this.application_load_balancer[0].target_group_id
 }
