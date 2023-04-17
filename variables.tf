@@ -317,12 +317,14 @@ variable "secondary_disks" {
   description = "Additional disks with params"
   type = map(object({
     enabled     = optional(bool, true)
-    auto_delete = optional(bool, false)
-    mode        = optional(string)
+    description =  optional(string, "")
     labels      = optional(map(string), {})
-    type        = optional(string, "network-hdd")
+    zone        = optional(string, null)
     size        = optional(number, 10)
     block_size  = optional(number, 4096)
+    type        = optional(string, "network-hdd")
+
+    mode        = optional(string, "READ_WRITE")
     device_name = optional(string, "data")
   }))
   default = {}

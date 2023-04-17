@@ -1,9 +1,9 @@
 locals {
   use_snapshot = var.image_snapshot_id != null ? true : false
-  image_id = (
-    coalesce(
-      var.image_id,
-      data.yandex_compute_image.this.id
+  image_id     = (
+  coalesce(
+    var.image_id,
+    data.yandex_compute_image.this.id
   ))
   ssh_keys = var.generate_ssh_key ? "${var.ssh_user}:${tls_private_key.this[0].public_key_openssh}" : (var.ssh_pubkey != null ? "${var.ssh_user}:${file(var.ssh_pubkey)}" : null)
 
@@ -79,30 +79,14 @@ resource "yandex_compute_instance_group" "this" {
       }
     }
 
-    # TODO
-    #    dynamic "secondary_disk" {
-    #      for_each = (
-    #      {
-    #      for disk_name, disk_info in yandex_compute_disk.this :
-    #      disk_name => merge(disk_info, var.secondary_disks[disk_name])
-    #      }
-    #      )
-    #
-    #      iterator = disk
-    #      content {
-    #        mode        = disk.value.mode
-    #        disk_id     = disk.value.id
-    #        device_name = disk.value.device_name
-    #
-    #        initialize_params {
-    #          description = "TODO"
-    #          size        = "TODO"
-    #          type        = "TODO"
-    #          image_id    = "TODO"
-    #          snapshot_id = "TODO"
-    #        }
-    #      }
-    #    }
+    dynamic "secondary_disk" {
+      for_each = var.secondary_disks
+
+      iterator = disk
+      content {
+        disk_id = yandex_compute_disk.main[disk.key].id
+      }
+    }
 
     network_interface {
       network_id         = var.network_id
