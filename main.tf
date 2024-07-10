@@ -31,7 +31,7 @@ resource "yandex_compute_instance_group" "this" {
     description = var.instance_description
     labels      = var.labels
 
-    hostname           = var.hostname
+    hostname           = format("%s-{instance.index}", var.name)
     service_account_id = var.service_account_id
 
     metadata = {
