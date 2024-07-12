@@ -1,44 +1,36 @@
+module "iam_accounts" {
+  source = "git::https://github.com/terraform-yacloud-modules/terraform-yandex-iam.git//modules/iam-account"
+
+  name      = "iam-yandex-compute-instance-group"
+  folder_id = "xxxx"
+  folder_roles = [
+    "editor"
+  ]
+  cloud_roles              = []
+  enable_static_access_key = false
+  enable_api_key           = false
+  enable_account_key       = false
+
+}
+
 module "yandex_compute_instance" {
   source = "../"
 
-  folder_id = "xxx"
+  folder_id = "xxxx"
 
   zones = ["ru-central1-a"]
 
-  name                       = "example-instance-group"
-  instance_group_description = "Example instance group"
-  instance_description       = "Example instance"
+  name = "example-instance-group"
 
-  labels = {
-    environment = "dev"
-  }
-
-  network_id = "xxx"
-  subnet_ids = ["xxx"]
+  network_id = "xxxx"
+  subnet_ids = ["xxxx"]
   enable_nat = true
-
-  variables = {
-    example_variable = "example_value"
-  }
 
   scale = {
     fixed = {
-      size = 2
+      size = 1
     }
   }
-
-  deploy_policy = {
-    max_unavailable  = 1
-    max_expansion    = 1
-    max_deleting     = 1
-    max_creating     = 1
-    startup_duration = 0
-    strategy         = "proactive"
-  }
-
-  enable_nlb_integration = false
-
-  enable_alb_integration = false
 
   max_checking_health_duration = 10
 
@@ -49,7 +41,7 @@ module "yandex_compute_instance" {
     healthy_threshold   = 3
     unhealthy_threshold = 3
     tcp_options = {
-      port = 8080
+      port = 22
     }
   }
 
@@ -58,15 +50,12 @@ module "yandex_compute_instance" {
   memory        = 4
   core_fraction = 100
 
-  preemptible              = false
-  placement_affinity_rules = []
+  image_family = "ubuntu-2004-lts"
 
-  image_family      = "ubuntu-2004-lts"
-
-  generate_ssh_key = true
-  ssh_user         = "ubuntu"
-  ssh_pubkey       = "~/.ssh/id_magnit.pub"
-  user_data        = null
+  hostname           = "my-instance"
+  service_account_id = module.iam_accounts.id
+  ssh_user           = "ubuntu"
+  ssh_pubkey         = "~/.ssh/id_rsa.pub"
 
   boot_disk = {
     mode        = "READ_WRITE"
@@ -74,25 +63,9 @@ module "yandex_compute_instance" {
   }
 
   boot_disk_initialize_params = {
-    size = 10
-    type = "network-hdd"
+    size = 30
+    type = "network-ssd"
   }
 
-  secondary_disks = {
-    disk1 = {
-      enabled     = true
-      description = "Secondary disk 1"
-      labels = {
-        type = "data"
-      }
-      zone        = "ru-central1-a"
-      size        = 20
-      block_size  = 4096
-      type        = "network-ssd"
-      mode        = "READ_WRITE"
-      device_name = "data1"
-    }
-  }
-
-
+  depends_on = [ module.iam_accounts ]
 }
