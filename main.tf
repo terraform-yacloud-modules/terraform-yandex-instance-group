@@ -31,7 +31,7 @@ resource "yandex_compute_instance_group" "this" {
     description = var.instance_description
     labels      = var.labels
 
-    hostname           = format("%s-{instance.index}", var.name)
+    hostname           = format("%s-{instance.index}", var.hostname)
     service_account_id = var.service_account_id
 
     metadata = {
@@ -136,17 +136,17 @@ resource "yandex_compute_instance_group" "this" {
       unhealthy_threshold = var.health_check["unhealthy_threshold"]
 
       dynamic "tcp_options" {
-        for_each = lookup(var.health_check, "tcp_options") != null ? [1] : []
+        for_each = var.health_check.tcp_options != null ? [1] : []
         content {
-          port = var.health_check["tcp_options"]["port"]
+          port = var.health_check.tcp_options.port
         }
       }
 
       dynamic "http_options" {
-        for_each = lookup(var.health_check, "http_options") != null ? [1] : []
+        for_each = var.health_check.http_options != null ? [1] : []
         content {
-          port = var.health_check["http_options"]["port"]
-          path = var.health_check["http_options"]["path"]
+          port = var.health_check.http_options.port
+          path = var.health_check.http_options.path
         }
       }
     }

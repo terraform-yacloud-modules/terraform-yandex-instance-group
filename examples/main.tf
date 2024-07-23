@@ -55,6 +55,7 @@ module "yandex_compute_instance" {
   hostname           = "my-instance"
   service_account_id = module.iam_accounts.id
   ssh_user           = "ubuntu"
+  generate_ssh_key   = false
   ssh_pubkey         = "~/.ssh/id_rsa.pub"
 
   boot_disk = {
