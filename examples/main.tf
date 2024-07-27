@@ -2,7 +2,6 @@ module "iam_accounts" {
   source = "git::https://github.com/terraform-yacloud-modules/terraform-yandex-iam.git//modules/iam-account"
 
   name      = "iam-yandex-compute-instance-group"
-  folder_id = "xxxx"
   folder_roles = [
     "editor"
   ]
@@ -16,14 +15,12 @@ module "iam_accounts" {
 module "yandex_compute_instance" {
   source = "../"
 
-  folder_id = "xxxx"
-
   zones = ["ru-central1-a"]
 
   name = "example-instance-group"
 
-  network_id = "xxxx"
-  subnet_ids = ["xxxx"]
+  network_id = "enpnci50506dmk59lltt"
+  subnet_ids = ["e9b7vm6aqjgsrpfbkhp8"]
   enable_nat = true
 
   scale = {
