@@ -19,8 +19,8 @@ module "yandex_compute_instance" {
 
   name = "example-instance-group"
 
-  network_id = "enpnci50506dmk59lltt"
-  subnet_ids = ["e9b7vm6aqjgsrpfbkhp8"]
+  network_id = "xxxx"
+  subnet_ids = ["xxxx"]
   enable_nat = true
 
   scale = {
