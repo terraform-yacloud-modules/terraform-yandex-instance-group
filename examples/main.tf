@@ -1,7 +1,7 @@
 module "iam_accounts" {
   source = "git::https://github.com/terraform-yacloud-modules/terraform-yandex-iam.git//modules/iam-account"
 
-  name      = "iam-yandex-compute-instance-group"
+  name = "iam-yandex-compute-instance-group"
   folder_roles = [
     "editor"
   ]
@@ -65,5 +65,5 @@ module "yandex_compute_instance" {
     type = "network-ssd"
   }
 
-  depends_on = [ module.iam_accounts ]
+  depends_on = [module.iam_accounts]
 }
