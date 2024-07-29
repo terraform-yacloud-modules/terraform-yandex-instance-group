@@ -1,6 +1,6 @@
 resource "yandex_compute_disk" "main" {
   for_each = {
-  for k, v in var.secondary_disks : k => v if v["enabled"]
+    for k, v in var.secondary_disks : k => v if v["enabled"]
   }
 
   name        = format("%s-%s", var.name, each.key)

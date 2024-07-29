@@ -16,13 +16,15 @@ maintainers to test your changes and to keep the examples up to date for users. 
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.3 |
+| <a name="requirement_tls"></a> [tls](#requirement\_tls) | >= 3.1.0 |
+| <a name="requirement_yandex"></a> [yandex](#requirement\_yandex) | >= 0.72.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_tls"></a> [tls](#provider\_tls) | n/a |
-| <a name="provider_yandex"></a> [yandex](#provider\_yandex) | n/a |
+| <a name="provider_tls"></a> [tls](#provider\_tls) | >= 3.1.0 |
+| <a name="provider_yandex"></a> [yandex](#provider\_yandex) | >= 0.72.0 |
 
 ## Modules
 
@@ -33,6 +35,7 @@ No modules.
 | Name | Type |
 |------|------|
 | [tls_private_key.this](https://registry.terraform.io/providers/hashicorp/tls/latest/docs/resources/private_key) | resource |
+| [yandex_compute_disk.main](https://registry.terraform.io/providers/yandex-cloud/yandex/latest/docs/resources/compute_disk) | resource |
 | [yandex_compute_instance_group.this](https://registry.terraform.io/providers/yandex-cloud/yandex/latest/docs/resources/compute_instance_group) | resource |
 | [yandex_client_config.client](https://registry.terraform.io/providers/yandex-cloud/yandex/latest/docs/data-sources/client_config) | data source |
 | [yandex_compute_image.this](https://registry.terraform.io/providers/yandex-cloud/yandex/latest/docs/data-sources/compute_image) | data source |
@@ -50,7 +53,6 @@ No modules.
 | <a name="input_enable_alb_integration"></a> [enable\_alb\_integration](#input\_enable\_alb\_integration) | If true, Application load balancer integration will be created | `bool` | `false` | no |
 | <a name="input_enable_nat"></a> [enable\_nat](#input\_enable\_nat) | Enable public IPv4 address | `bool` | `false` | no |
 | <a name="input_enable_nlb_integration"></a> [enable\_nlb\_integration](#input\_enable\_nlb\_integration) | If true, Network load balancer integration will be created | `bool` | `false` | no |
-| <a name="input_folder_id"></a> [folder\_id](#input\_folder\_id) | Folder ID | `string` | `null` | no |
 | <a name="input_generate_ssh_key"></a> [generate\_ssh\_key](#input\_generate\_ssh\_key) | If true, SSH key will be generated for instance group | `string` | `true` | no |
 | <a name="input_health_check"></a> [health\_check](#input\_health\_check) | Health check configuration | <pre>object({<br>    enabled             = optional(bool, false)<br>    interval            = optional(number, 15)<br>    timeout             = optional(number, 10)<br>    healthy_threshold   = optional(number, 3)<br>    unhealthy_threshold = optional(number, 3)<br>    tcp_options = optional(object({<br>      port = number<br>    }), null)<br>    http_options = optional(object({<br>      port = number,<br>      path = string<br>    }), null)<br>  })</pre> | <pre>{<br>  "enabled": true,<br>  "tcp_options": {<br>    "port": 8080<br>  }<br>}</pre> | no |
 | <a name="input_hostname"></a> [hostname](#input\_hostname) | Hostname of the instance. More info: https://cloud.yandex.ru/docs/compute/concepts/network#hostname | `string` | `null` | no |
@@ -65,12 +67,10 @@ No modules.
 | <a name="input_name"></a> [name](#input\_name) | Name which will be used for all resources | `string` | n/a | yes |
 | <a name="input_network_acceleration_type"></a> [network\_acceleration\_type](#input\_network\_acceleration\_type) | Network acceleration type | `string` | `"STANDARD"` | no |
 | <a name="input_network_id"></a> [network\_id](#input\_network\_id) | Network ID | `string` | `null` | no |
-| <a name="input_placement_affinity_rules"></a> [placement\_affinity\_rules](#input\_placement\_affinity\_rules) | List of host affinity rules | <pre>list(object({<br>    key   = string<br>    op    = string<br>    value = string<br>  }))</pre> | `[]` | no |
-| <a name="input_placement_group_id"></a> [placement\_group\_id](#input\_placement\_group\_id) | Placement group ID | `string` | `null` | no |
 | <a name="input_platform_id"></a> [platform\_id](#input\_platform\_id) | Hardware CPU platform name (Intel Ice Lake by default) | `string` | `"standard-v3"` | no |
 | <a name="input_preemptible"></a> [preemptible](#input\_preemptible) | Make instance preemptible | `bool` | `false` | no |
 | <a name="input_scale"></a> [scale](#input\_scale) | Instance group scaling policy | <pre>object({<br>    fixed = optional(object({<br>      size = number<br>    }), null)<br>    auto = optional(object({<br>      initial_size           = number<br>      measurement_duration   = number<br>      cpu_utilization_target = string<br>      min_zone_size          = number<br>      max_size               = number<br>      warmup_duration        = string<br>      stabilization_duration = string<br>    }), null)<br><br>  })</pre> | <pre>{<br>  "fixed": {<br>    "size": 1<br>  }<br>}</pre> | no |
-| <a name="input_secondary_disks"></a> [secondary\_disks](#input\_secondary\_disks) | Additional disks with params | <pre>map(object({<br>    enabled     = optional(bool, true)<br>    auto_delete = optional(bool, false)<br>    mode        = optional(string)<br>    labels      = optional(map(string), {})<br>    type        = optional(string, "network-hdd")<br>    size        = optional(number, 10)<br>    block_size  = optional(number, 4096)<br>    device_name = optional(string, "data")<br>  }))</pre> | `{}` | no |
+| <a name="input_secondary_disks"></a> [secondary\_disks](#input\_secondary\_disks) | Additional disks with params | <pre>map(object({<br>    enabled     = optional(bool, true)<br>    description = optional(string, "")<br>    labels      = optional(map(string), {})<br>    zone        = optional(string, null)<br>    size        = optional(number, 10)<br>    block_size  = optional(number, 4096)<br>    type        = optional(string, "network-hdd")<br><br>    mode        = optional(string, "READ_WRITE")<br>    device_name = optional(string, "data")<br>  }))</pre> | `{}` | no |
 | <a name="input_security_group_ids"></a> [security\_group\_ids](#input\_security\_group\_ids) | Security group IDs linked to instances | `list(string)` | `null` | no |
 | <a name="input_serial_port_enable"></a> [serial\_port\_enable](#input\_serial\_port\_enable) | Enable serial port on instances | `bool` | `false` | no |
 | <a name="input_service_account_id"></a> [service\_account\_id](#input\_service\_account\_id) | ID of the service account authorized for instance | `string` | `null` | no |
@@ -85,6 +85,7 @@ No modules.
 
 | Name | Description |
 |------|-------------|
+| <a name="output_compute_disks"></a> [compute\_disks](#output\_compute\_disks) | Secondary disk's data |
 | <a name="output_instance_group_id"></a> [instance\_group\_id](#output\_instance\_group\_id) | Compute instance group ID |
 | <a name="output_ssh_key_prv"></a> [ssh\_key\_prv](#output\_ssh\_key\_prv) | Private SSH key |
 | <a name="output_ssh_key_pub"></a> [ssh\_key\_pub](#output\_ssh\_key\_pub) | Public SSH key |
