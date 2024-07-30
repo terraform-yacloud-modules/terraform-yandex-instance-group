@@ -69,11 +69,22 @@ module "yandex_compute_instance" {
 
   image_family = "ubuntu-2004-lts"
 
+  enable_alb_integration = true
   hostname           = "my-instance"
   service_account_id = module.iam_accounts.id
   ssh_user           = "ubuntu"
   generate_ssh_key   = false
   ssh_pubkey         = "~/.ssh/id_rsa.pub"
+
+  user_data = <<-EOF
+        #cloud-config
+        package_upgrade: true
+        packages:
+          - nginx
+        runcmd:
+          - [systemctl, start, nginx]
+          - [systemctl, enable, nginx]
+        EOF
 
   boot_disk = {
     mode        = "READ_WRITE"
