@@ -99,3 +99,19 @@ module "yandex_compute_instance" {
 
   depends_on = [module.iam_accounts]
 }
+
+module "lockbox_instance_secrets" {
+  source = "git::https://github.com/terraform-yacloud-modules/terraform-yandex-lockbox.git?ref=v1.0.0"
+
+  name = "example-instance-group-secrets"
+  labels = {
+    repo = "terraform-yacloud-modules/terraform-yandex-lockbox"
+  }
+
+  entries = {
+    "ssh-prv" : module.yandex_compute_instance.ssh_key_prv
+    "ssh-pub" : module.yandex_compute_instance.ssh_key_pub
+  }
+
+  deletion_protection = false
+}
