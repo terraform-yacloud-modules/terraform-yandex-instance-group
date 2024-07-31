@@ -33,7 +33,7 @@ module "network" {
 }
 
 module "yandex_compute_instance" {
-  source = "../"
+  source = "../../"
 
   zones = ["ru-central1-a"]
 

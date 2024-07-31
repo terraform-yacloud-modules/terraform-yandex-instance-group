@@ -33,7 +33,7 @@ Note that this example may create resources which can cost money. Run `terraform
 |------|--------|---------|
 | <a name="module_iam_accounts"></a> [iam\_accounts](#module\_iam\_accounts) | git::https://github.com/terraform-yacloud-modules/terraform-yandex-iam.git//modules/iam-account | v1.0.0 |
 | <a name="module_network"></a> [network](#module\_network) | git::https://github.com/terraform-yacloud-modules/terraform-yandex-vpc.git | v1.0.0 |
-| <a name="module_yandex_compute_instance"></a> [yandex\_compute\_instance](#module\_yandex\_compute\_instance) | ../ | n/a |
+| <a name="module_yandex_compute_instance"></a> [yandex\_compute\_instance](#module\_yandex\_compute\_instance) | ../../ | n/a |
 
 ## Resources
 
