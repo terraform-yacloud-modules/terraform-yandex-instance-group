@@ -33,9 +33,10 @@ resource "yandex_compute_instance_group" "this" {
     service_account_id = var.service_account_id
 
     metadata = {
-      serial-port-enable = var.serial_port_enable ? 1 : null
-      ssh-keys           = local.ssh_keys
-      user-data          = var.user_data
+      serial-port-enable    = var.serial_port_enable ? 1 : null
+      install-unified-agent = var.install_unified_agent ? 1 : 0
+      ssh-keys              = local.ssh_keys
+      user-data             = var.user_data
     }
 
     platform_id = var.platform_id
