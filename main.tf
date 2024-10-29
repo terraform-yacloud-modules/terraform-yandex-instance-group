@@ -153,7 +153,7 @@ resource "yandex_compute_instance_group" "this" {
   dynamic "application_load_balancer" {
     for_each = var.enable_alb_integration ? [1] : []
     content {
-      target_group_name            = try(var.target_group.description, var.name, "target-group")
+      target_group_name            = try(var.target_group.name, var.name, "target-group")
       target_group_description     = try(var.target_group.description, "")
       target_group_labels          = try(var.target_group.labels, var.labels, {})
       max_opening_traffic_duration = var.max_opening_traffic_duration
@@ -163,7 +163,7 @@ resource "yandex_compute_instance_group" "this" {
   dynamic "load_balancer" {
     for_each = var.enable_nlb_integration ? [1] : []
     content {
-      target_group_name            = try(var.target_group.description, var.name, "target-group")
+      target_group_name            = try(var.target_group.name, var.name, "target-group")
       target_group_description     = try(var.target_group.description, "")
       target_group_labels          = try(var.target_group.labels, var.labels, {})
       max_opening_traffic_duration = var.max_opening_traffic_duration
