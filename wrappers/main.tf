@@ -40,4 +40,5 @@ module "wrapper" {
   boot_disk                    = try(each.value.boot_disk, var.defaults.boot_disk, {})
   boot_disk_initialize_params  = try(each.value.boot_disk_initialize_params, var.defaults.boot_disk_initialize_params, { size = 10, type = "network-hdd" })
   secondary_disks              = try(each.value.secondary_disks, var.defaults.secondary_disks, {})
+  target_group                 = try(each.value.target_group, var.defaults.target_group, { name = null, description = null, labels = {} })
 }
