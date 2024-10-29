@@ -97,6 +97,7 @@ variable "scale" {
       initial_size           = number
       measurement_duration   = number
       cpu_utilization_target = string
+      auto_scale_type        = string
       min_zone_size          = number
       max_size               = number
       warmup_duration        = string

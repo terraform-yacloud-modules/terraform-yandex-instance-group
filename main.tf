@@ -116,6 +116,7 @@ resource "yandex_compute_instance_group" "this" {
         initial_size           = var.scale.auto.initial_size
         measurement_duration   = var.scale.auto.measurement_duration
         cpu_utilization_target = var.scale.auto.cpu_utilization_target
+        auto_scale_type        = var.scale.auto.auto_scale_type
         min_zone_size          = var.scale.auto.min_zone_size
         max_size               = var.scale.auto.max_size
         warmup_duration        = var.scale.auto.warmup_duration
