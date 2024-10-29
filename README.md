@@ -77,6 +77,7 @@ No modules.
 | <a name="input_ssh_pubkey"></a> [ssh\_pubkey](#input\_ssh\_pubkey) | Public RSA key path to inject | `string` | `null` | no |
 | <a name="input_ssh_user"></a> [ssh\_user](#input\_ssh\_user) | Initial SSH username for instance | `string` | `"ubuntu"` | no |
 | <a name="input_subnet_ids"></a> [subnet\_ids](#input\_subnet\_ids) | VPC Subnet IDs | `list(string)` | `[]` | no |
+| <a name="input_target_group"></a> [target\_group](#input\_target\_group) | Target group parameters | <pre>object({<br>    name        = optional(string)<br>    description = optional(string)<br>    labels      = optional(map(string))<br>  })</pre> | <pre>{<br>  "description": null,<br>  "labels": {},<br>  "name": null<br>}</pre> | no |
 | <a name="input_user_data"></a> [user\_data](#input\_user\_data) | Cloud-init user-data | `string` | `null` | no |
 | <a name="input_variables"></a> [variables](#input\_variables) | A set of key/value variables pairs to assign to the instance group | `map(string)` | `{}` | no |
 | <a name="input_zones"></a> [zones](#input\_zones) | A list of availability zones | `list(string)` | `[]` | no |

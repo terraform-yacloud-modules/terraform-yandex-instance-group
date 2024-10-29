@@ -145,6 +145,20 @@ variable "max_opening_traffic_duration" {
   default     = 300
 }
 
+variable "target_group" {
+  description = "Target group parameters"
+  type = object({
+    name        = optional(string)
+    description = optional(string)
+    labels      = optional(map(string))
+  })
+  default = {
+    name        = null
+    description = null
+    labels      = {}
+  }
+}
+
 variable "max_checking_health_duration" {
   description = "Timeout for waiting for the VM to become healthy"
   type        = number
