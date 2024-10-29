@@ -347,6 +347,6 @@ variable "secondary_disks" {
 
 variable "install_unified_agent" {
   description = "Install unified agent"
-  type        = number
-  default     = 0
+  type        = bool
+  default     = false
 }

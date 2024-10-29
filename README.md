@@ -58,7 +58,7 @@ No modules.
 | <a name="input_image_family"></a> [image\_family](#input\_image\_family) | Default image family name (lowest priority) | `string` | `"ubuntu-2004-lts"` | no |
 | <a name="input_image_id"></a> [image\_id](#input\_image\_id) | Image ID (medium priority) | `string` | `null` | no |
 | <a name="input_image_snapshot_id"></a> [image\_snapshot\_id](#input\_image\_snapshot\_id) | Image snapshot id to initialize from.<br>Highest priority over var.image\_id<br>and var.image\_family" | `string` | `null` | no |
-| <a name="input_install_unified_agent"></a> [install\_unified\_agent](#input\_install\_unified\_agent) | Install unified agent | `number` | `0` | no |
+| <a name="input_install_unified_agent"></a> [install\_unified\_agent](#input\_install\_unified\_agent) | Install unified agent | `bool` | `false` | no |
 | <a name="input_instance_description"></a> [instance\_description](#input\_instance\_description) | Instance description | `string` | `null` | no |
 | <a name="input_instance_group_description"></a> [instance\_group\_description](#input\_instance\_group\_description) | Instance group description | `string` | `null` | no |
 | <a name="input_labels"></a> [labels](#input\_labels) | A set of labels which will be applied to all resources | `map(string)` | `{}` | no |
