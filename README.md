@@ -62,6 +62,7 @@ No modules.
 | <a name="input_instance_group_description"></a> [instance\_group\_description](#input\_instance\_group\_description) | Instance group description | `string` | `null` | no |
 | <a name="input_labels"></a> [labels](#input\_labels) | A set of labels which will be applied to all resources | `map(string)` | `{}` | no |
 | <a name="input_max_checking_health_duration"></a> [max\_checking\_health\_duration](#input\_max\_checking\_health\_duration) | Timeout for waiting for the VM to become healthy | `number` | `10` | no |
+| <a name="input_max_opening_traffic_duration"></a> [max\_opening\_traffic\_duration](#input\_max\_opening\_traffic\_duration) | Timeout for waiting for the VM to become healthy | `number` | `300` | no |
 | <a name="input_memory"></a> [memory](#input\_memory) | Memory allocated to instance (in Gb) | `number` | `2` | no |
 | <a name="input_name"></a> [name](#input\_name) | Name which will be used for all resources | `string` | n/a | yes |
 | <a name="input_network_acceleration_type"></a> [network\_acceleration\_type](#input\_network\_acceleration\_type) | Network acceleration type | `string` | `"STANDARD"` | no |

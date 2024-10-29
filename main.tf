@@ -156,7 +156,7 @@ resource "yandex_compute_instance_group" "this" {
       target_group_name            = var.name
       target_group_description     = ""
       target_group_labels          = var.labels
-      max_opening_traffic_duration = 300
+      max_opening_traffic_duration = var.max_opening_traffic_duration
     }
   }
 
@@ -166,7 +166,7 @@ resource "yandex_compute_instance_group" "this" {
       target_group_name            = var.name
       target_group_description     = ""
       target_group_labels          = var.labels
-      max_opening_traffic_duration = 300
+      max_opening_traffic_duration = var.max_opening_traffic_duration
     }
   }
 

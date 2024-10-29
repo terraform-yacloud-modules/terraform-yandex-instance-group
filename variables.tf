@@ -139,6 +139,12 @@ variable "enable_alb_integration" {
   default     = false
 }
 
+variable "max_opening_traffic_duration" {
+  description = "Timeout for waiting for the VM to become healthy"
+  type        = number
+  default     = 300
+}
+
 variable "max_checking_health_duration" {
   description = "Timeout for waiting for the VM to become healthy"
   type        = number

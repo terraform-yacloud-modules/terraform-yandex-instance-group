@@ -20,6 +20,7 @@ module "wrapper" {
   deploy_policy                = try(each.value.deploy_policy, var.defaults.deploy_policy, { max_unavailable = 1, max_expansion = 1 })
   enable_nlb_integration       = try(each.value.enable_nlb_integration, var.defaults.enable_nlb_integration, false)
   enable_alb_integration       = try(each.value.enable_alb_integration, var.defaults.enable_alb_integration, false)
+  max_opening_traffic_duration = try(each.value.max_opening_traffic_duration, var.defaults.max_opening_traffic_duration, 300)
   max_checking_health_duration = try(each.value.max_checking_health_duration, var.defaults.max_checking_health_duration, 10)
   health_check                 = try(each.value.health_check, var.defaults.health_check, { enabled = true, tcp_options = { port = 8080 } })
   platform_id                  = try(each.value.platform_id, var.defaults.platform_id, "standard-v3")
