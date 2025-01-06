@@ -328,21 +328,22 @@ variable "boot_disk_initialize_params" {
   default = {}
 }
 
-variable "secondary_disks" {
-  description = "Additional disks with params"
-  type = map(object({
-    enabled     = optional(bool, true)
-    description = optional(string, "")
-    labels      = optional(map(string), {})
-    zone        = optional(string, null)
-    size        = optional(number, 10)
-    block_size  = optional(number, 4096)
-    type        = optional(string, "network-hdd")
+variable "secondary_disk" {
+  description = "Additional disk with params"
+  type = object({
+    device_name = optional(string)
+    disk_id     = optional(string)
+    name        = optional(string)
 
-    mode        = optional(string, "READ_WRITE")
-    device_name = optional(string, "data")
-  }))
-  default = {}
+    initialize_params = optional(object({
+      description = optional(string)
+      size        = optional(number)
+      type        = optional(string)
+      image_id    = optional(string)
+      snapshot_id = optional(string)
+    }), null)
+  })
+  default = null
 }
 
 variable "install_unified_agent" {

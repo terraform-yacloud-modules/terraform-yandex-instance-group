@@ -48,15 +48,15 @@ resource "yandex_compute_instance_group" "this" {
     #  placement_policy {
     #    placement_group_id = var.placement_group_id
     #
-    #    dynamic "host_affinity_rules" {
-    #      for_each = var.placement_affinity_rules
-    #
-    #      content {
-    #        key   = host_affinity_rules.value["key"]
-    #        op    = host_affinity_rules.value["op"]
-    #        value = host_affinity_rules.value["value"]
-    #      }
-    #    }
+    #    # dynamic "host_affinity_rules" {
+    #    #   for_each = var.placement_affinity_rules
+    #    #
+    #    #   content {
+    #    #     key   = host_affinity_rules.value["key"]
+    #    #     op    = host_affinity_rules.value["op"]
+    #    #     value = host_affinity_rules.value["value"]
+    #    #   }
+    #    # }
     #  }
 
     resources {
@@ -79,11 +79,27 @@ resource "yandex_compute_instance_group" "this" {
     }
 
     dynamic "secondary_disk" {
-      for_each = var.secondary_disks
+      for_each = var.secondary_disk != null ? [1] : []
 
-      iterator = disk
       content {
-        disk_id = yandex_compute_disk.main[disk.key].id
+        mode        = "READ_WRITE"
+        device_name = try(var.secondary_disk.device_name, null)
+
+        # ID of the existing disk. To set use variables.
+        disk_id = try(var.secondary_disk.disk_id, null)
+
+        name = try(var.secondary_disk.name, "secondary-disk")
+
+        dynamic "initialize_params" {
+          for_each = var.secondary_disk.initialize_params != null ? [1] : []
+          content {
+            description = try(var.secondary_disk.initialize_params.description, "")
+            size        = try(var.secondary_disk.initialize_params.size, null)
+            type        = try(var.secondary_disk.initialize_params.type, null)
+            image_id    = try(var.secondary_disk.initialize_params.image_id, null)
+            snapshot_id = try(var.secondary_disk.initialize_params.snapshot_id, null)
+          }
+        }
       }
     }
 
