@@ -33,9 +33,10 @@ resource "yandex_compute_instance_group" "this" {
     service_account_id = var.service_account_id
 
     metadata = {
-      serial-port-enable = var.serial_port_enable ? 1 : null
-      ssh-keys           = local.ssh_keys
-      user-data          = var.user_data
+      serial-port-enable    = var.serial_port_enable ? 1 : null
+      install-unified-agent = var.install_unified_agent ? 1 : 0
+      ssh-keys              = local.ssh_keys
+      user-data             = var.user_data
     }
 
     platform_id = var.platform_id
@@ -47,15 +48,15 @@ resource "yandex_compute_instance_group" "this" {
     #  placement_policy {
     #    placement_group_id = var.placement_group_id
     #
-    #    dynamic "host_affinity_rules" {
-    #      for_each = var.placement_affinity_rules
-    #
-    #      content {
-    #        key   = host_affinity_rules.value["key"]
-    #        op    = host_affinity_rules.value["op"]
-    #        value = host_affinity_rules.value["value"]
-    #      }
-    #    }
+    #    # dynamic "host_affinity_rules" {
+    #    #   for_each = var.placement_affinity_rules
+    #    #
+    #    #   content {
+    #    #     key   = host_affinity_rules.value["key"]
+    #    #     op    = host_affinity_rules.value["op"]
+    #    #     value = host_affinity_rules.value["value"]
+    #    #   }
+    #    # }
     #  }
 
     resources {
@@ -78,11 +79,27 @@ resource "yandex_compute_instance_group" "this" {
     }
 
     dynamic "secondary_disk" {
-      for_each = var.secondary_disks
+      for_each = var.secondary_disk != null ? [1] : []
 
-      iterator = disk
       content {
-        disk_id = yandex_compute_disk.main[disk.key].id
+        mode        = "READ_WRITE"
+        device_name = try(var.secondary_disk.device_name, null)
+
+        # ID of the existing disk. To set use variables.
+        disk_id = try(var.secondary_disk.disk_id, null)
+
+        name = try(var.secondary_disk.name, "secondary-disk")
+
+        dynamic "initialize_params" {
+          for_each = var.secondary_disk.initialize_params != null ? [1] : []
+          content {
+            description = try(var.secondary_disk.initialize_params.description, "")
+            size        = try(var.secondary_disk.initialize_params.size, null)
+            type        = try(var.secondary_disk.initialize_params.type, null)
+            image_id    = try(var.secondary_disk.initialize_params.image_id, null)
+            snapshot_id = try(var.secondary_disk.initialize_params.snapshot_id, null)
+          }
+        }
       }
     }
 
@@ -116,6 +133,7 @@ resource "yandex_compute_instance_group" "this" {
         initial_size           = var.scale.auto.initial_size
         measurement_duration   = var.scale.auto.measurement_duration
         cpu_utilization_target = var.scale.auto.cpu_utilization_target
+        auto_scale_type        = try(var.scale.auto.auto_scale_type, "ZONAL")
         min_zone_size          = var.scale.auto.min_zone_size
         max_size               = var.scale.auto.max_size
         warmup_duration        = var.scale.auto.warmup_duration
@@ -153,20 +171,20 @@ resource "yandex_compute_instance_group" "this" {
   dynamic "application_load_balancer" {
     for_each = var.enable_alb_integration ? [1] : []
     content {
-      target_group_name            = var.name
-      target_group_description     = ""
-      target_group_labels          = var.labels
-      max_opening_traffic_duration = 300
+      target_group_name            = try(var.target_group.name, var.name, "target-group")
+      target_group_description     = try(var.target_group.description, "")
+      target_group_labels          = try(var.target_group.labels, var.labels, {})
+      max_opening_traffic_duration = var.max_opening_traffic_duration
     }
   }
 
   dynamic "load_balancer" {
     for_each = var.enable_nlb_integration ? [1] : []
     content {
-      target_group_name            = var.name
-      target_group_description     = ""
-      target_group_labels          = var.labels
-      max_opening_traffic_duration = 300
+      target_group_name            = try(var.target_group.name, var.name, "target-group")
+      target_group_description     = try(var.target_group.description, "")
+      target_group_labels          = try(var.target_group.labels, var.labels, {})
+      max_opening_traffic_duration = var.max_opening_traffic_duration
     }
   }
 

@@ -97,6 +97,7 @@ variable "scale" {
       initial_size           = number
       measurement_duration   = number
       cpu_utilization_target = string
+      auto_scale_type        = string
       min_zone_size          = number
       max_size               = number
       warmup_duration        = string
@@ -137,6 +138,26 @@ variable "enable_alb_integration" {
   description = "If true, Application load balancer integration will be created"
   type        = bool
   default     = false
+}
+
+variable "max_opening_traffic_duration" {
+  description = "Timeout for waiting for the VM to become healthy"
+  type        = number
+  default     = 300
+}
+
+variable "target_group" {
+  description = "Target group parameters"
+  type = object({
+    name        = optional(string)
+    description = optional(string)
+    labels      = optional(map(string))
+  })
+  default = {
+    name        = null
+    description = null
+    labels      = {}
+  }
 }
 
 variable "max_checking_health_duration" {
@@ -307,19 +328,26 @@ variable "boot_disk_initialize_params" {
   default = {}
 }
 
-variable "secondary_disks" {
-  description = "Additional disks with params"
-  type = map(object({
-    enabled     = optional(bool, true)
-    description = optional(string, "")
-    labels      = optional(map(string), {})
-    zone        = optional(string, null)
-    size        = optional(number, 10)
-    block_size  = optional(number, 4096)
-    type        = optional(string, "network-hdd")
+variable "secondary_disk" {
+  description = "Additional disk with params"
+  type = object({
+    device_name = optional(string)
+    disk_id     = optional(string)
+    name        = optional(string)
 
-    mode        = optional(string, "READ_WRITE")
-    device_name = optional(string, "data")
-  }))
-  default = {}
+    initialize_params = optional(object({
+      description = optional(string)
+      size        = optional(number)
+      type        = optional(string)
+      image_id    = optional(string)
+      snapshot_id = optional(string)
+    }), null)
+  })
+  default = null
+}
+
+variable "install_unified_agent" {
+  description = "Install unified agent"
+  type        = bool
+  default     = false
 }
