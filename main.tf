@@ -182,4 +182,14 @@ resource "yandex_compute_instance_group" "this" {
     startup_duration = var.deploy_policy.startup_duration
     strategy         = var.deploy_policy.strategy
   }
+
+  dynamic "timeouts" {
+    for_each = var.timeouts == null ? [] : [var.timeouts]
+    content {
+      create = try(timeouts.value.create, null)
+      update = try(timeouts.value.update, null)
+      delete = try(timeouts.value.delete, null)
+    }
+  }
+
 }
