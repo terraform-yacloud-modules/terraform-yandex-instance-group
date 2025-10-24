@@ -45,5 +45,7 @@ module "yandex_compute_instance" {
 
   service_account_id = module.iam_accounts.id
 
+  image_id = "fd8vmcue7aajpmeo39kk" # Ubuntu 20.04 LTS
+
   depends_on = [module.iam_accounts]
 }
