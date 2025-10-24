@@ -43,27 +43,7 @@ module "yandex_compute_instance" {
   subnet_ids = [module.network.private_subnets_ids[0]]
   enable_nat = true
 
-  health_check = {
-    enabled = true
-    tcp_options = {
-      port = 80
-    }
-  }
-
-  hostname           = "my-instance"
   service_account_id = module.iam_accounts.id
-  generate_ssh_key   = false
-  ssh_pubkey         = "~/.ssh/id_rsa.pub"
-
-  user_data = <<-EOF
-        #cloud-config
-        package_upgrade: true
-        packages:
-          - nginx
-        runcmd:
-          - [systemctl, start, nginx]
-          - [systemctl, enable, nginx]
-        EOF
 
   depends_on = [module.iam_accounts]
 }

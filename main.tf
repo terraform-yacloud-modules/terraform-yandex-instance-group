@@ -1,13 +1,13 @@
 resource "yandex_compute_instance_group" "this" {
-  name        = var.name
-  labels      = var.labels
+  name   = var.name
+  labels = var.labels
 
-  folder_id           = var.folder_id
-  service_account_id  = var.service_account_id
+  folder_id          = var.folder_id
+  service_account_id = var.service_account_id
 
   instance_template {
-    name        = format("%s-{instance.index}", var.name)
-    labels      = var.labels
+    name   = format("%s-{instance.index}", var.name)
+    labels = var.labels
 
     service_account_id = var.service_account_id
 
