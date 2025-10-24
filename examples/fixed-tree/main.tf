@@ -37,16 +37,36 @@ module "yandex_compute_instance" {
 
   zones = ["ru-central1-a", "ru-central1-b", "ru-central1-d"]
 
-  name = "example-instance-group"
+  name                       = "example-instance-group"
+  instance_group_description = "Example instance group with fixed scaling"
+  instance_description       = "Ubuntu instance with nginx"
 
-  network_id = module.network.vpc_id
-  subnet_ids = [module.network.private_subnets_ids[0], module.network.private_subnets_ids[1], module.network.private_subnets_ids[2]]
-  enable_nat = true
+  labels = {
+    environment = "test"
+    project     = "demo"
+    managed-by  = "terraform"
+  }
+
+  network_id         = module.network.vpc_id
+  subnet_ids         = [module.network.private_subnets_ids[0], module.network.private_subnets_ids[1], module.network.private_subnets_ids[2]]
+  enable_nat         = true
+  security_group_ids = null
+
+  network_acceleration_type = "STANDARD"
 
   scale = {
     fixed = {
       size = 3
     }
+  }
+
+  deploy_policy = {
+    max_unavailable  = 1
+    max_expansion    = 1
+    max_deleting     = 1
+    max_creating     = 1
+    startup_duration = 60
+    strategy         = "proactive"
   }
 
   max_checking_health_duration = 10
@@ -66,10 +86,14 @@ module "yandex_compute_instance" {
   cores         = 2
   memory        = 4
   core_fraction = 100
+  gpus          = 0
+
+  preemptible = false
 
   image_family = "ubuntu-2004-lts"
 
   enable_alb_integration = true
+  enable_nlb_integration = false
 
   hostname           = "my-instance"
   service_account_id = module.iam_accounts.id
@@ -95,6 +119,25 @@ module "yandex_compute_instance" {
   boot_disk_initialize_params = {
     size = 30
     type = "network-ssd"
+  }
+
+  secondary_disks = {
+    data-disk = {
+      enabled     = true
+      description = "Additional data disk"
+      size        = 20
+      type        = "network-hdd"
+      mode        = "READ_WRITE"
+      device_name = "data"
+      zone        = "ru-central1-a"
+    }
+  }
+
+  deletion_protection = false
+
+  variables = {
+    ENVIRONMENT = "test"
+    PROJECT     = "demo"
   }
 
   depends_on = [module.iam_accounts]

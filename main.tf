@@ -1,3 +1,5 @@
+data "yandex_client_config" "client" {}
+
 locals {
   use_snapshot = var.image_snapshot_id != null ? true : false
   image_id = (
@@ -21,6 +23,7 @@ resource "yandex_compute_instance_group" "this" {
   labels      = var.labels
   variables   = var.variables
 
+  folder_id           = coalesce(var.folder_id, data.yandex_client_config.client.folder_id)
   service_account_id  = var.service_account_id
   deletion_protection = var.deletion_protection
 
@@ -36,6 +39,16 @@ resource "yandex_compute_instance_group" "this" {
       serial-port-enable = var.serial_port_enable ? 1 : null
       ssh-keys           = local.ssh_keys
       user-data          = var.user_data
+    }
+
+    dynamic "metadata_options" {
+      for_each = length(keys(var.metadata_options)) > 0 ? [var.metadata_options] : []
+      content {
+        aws_v1_http_endpoint = metadata_options.value.aws_v1_http_endpoint
+        aws_v1_http_token    = metadata_options.value.aws_v1_http_token
+        gce_http_endpoint    = metadata_options.value.gce_http_endpoint
+        gce_http_token       = metadata_options.value.gce_http_token
+      }
     }
 
     platform_id = var.platform_id
@@ -62,6 +75,7 @@ resource "yandex_compute_instance_group" "this" {
       cores         = var.cores
       memory        = var.memory
       core_fraction = var.core_fraction
+      gpus          = var.gpus
     }
 
     boot_disk {
@@ -86,15 +100,50 @@ resource "yandex_compute_instance_group" "this" {
       }
     }
 
+    dynamic "filesystem" {
+      for_each = var.filesystems
+      content {
+        filesystem_id = filesystem.value.filesystem_id
+        device_name   = filesystem.value.device_name
+        mode          = filesystem.value.mode
+      }
+    }
+
     network_interface {
       network_id         = var.network_id
       subnet_ids         = var.subnet_ids
       nat                = var.enable_nat
       security_group_ids = var.security_group_ids
 
-      # dns_record {}
-      # ipv6_dns_record{}
-      # nat_dns_record {}
+      dynamic "dns_record" {
+        for_each = var.network_interface_dns_records
+        content {
+          dns_zone_id = dns_record.value.dns_zone_id
+          fqdn        = dns_record.value.fqdn
+          ptr         = dns_record.value.ptr
+          ttl         = dns_record.value.ttl
+        }
+      }
+
+      dynamic "ipv6_dns_record" {
+        for_each = var.network_interface_ipv6_dns_records
+        content {
+          dns_zone_id = ipv6_dns_record.value.dns_zone_id
+          fqdn        = ipv6_dns_record.value.fqdn
+          ptr         = ipv6_dns_record.value.ptr
+          ttl         = ipv6_dns_record.value.ttl
+        }
+      }
+
+      dynamic "nat_dns_record" {
+        for_each = var.network_interface_nat_dns_records
+        content {
+          dns_zone_id = nat_dns_record.value.dns_zone_id
+          fqdn        = nat_dns_record.value.fqdn
+          ptr         = nat_dns_record.value.ptr
+          ttl         = nat_dns_record.value.ttl
+        }
+      }
     }
 
     network_settings {

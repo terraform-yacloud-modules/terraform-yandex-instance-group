@@ -1,6 +1,12 @@
 #
 # yandex cloud coordinates
 #
+variable "folder_id" {
+  description = "Folder ID where the instance group will be created"
+  type        = string
+  default     = null
+}
+
 variable "zones" {
   description = "A list of availability zones"
   type        = list(string)
@@ -66,10 +72,64 @@ variable "network_acceleration_type" {
   default     = "STANDARD"
 }
 
+variable "network_interface_dns_records" {
+  description = "DNS records configuration for network interface"
+  type = list(object({
+    dns_zone_id = optional(string)
+    fqdn        = string
+    ptr         = optional(bool, false)
+    ttl         = optional(number, 300)
+  }))
+  default = []
+}
+
+variable "network_interface_ipv6_dns_records" {
+  description = "IPv6 DNS records configuration for network interface"
+  type = list(object({
+    dns_zone_id = optional(string)
+    fqdn        = string
+    ptr         = optional(bool, false)
+    ttl         = optional(number, 300)
+  }))
+  default = []
+}
+
+variable "network_interface_nat_dns_records" {
+  description = "NAT DNS records configuration for network interface"
+  type = list(object({
+    dns_zone_id = optional(string)
+    fqdn        = string
+    ptr         = optional(bool, false)
+    ttl         = optional(number, 300)
+  }))
+  default = []
+}
+
 variable "serial_port_enable" {
   description = "Enable serial port on instances"
   type        = bool
   default     = false
+}
+
+variable "metadata_options" {
+  description = "Metadata options configuration for accessing instance metadata"
+  type = object({
+    aws_v1_http_endpoint = optional(number, 1)
+    aws_v1_http_token    = optional(number, 1)
+    gce_http_endpoint    = optional(number, 1)
+    gce_http_token       = optional(number, 1)
+  })
+  default = {}
+}
+
+variable "filesystems" {
+  description = "Filesystems to attach to instances"
+  type = map(object({
+    filesystem_id = string
+    device_name   = optional(string)
+    mode          = optional(string, "READ_WRITE")
+  }))
+  default = {}
 }
 
 #
@@ -118,7 +178,7 @@ variable "deploy_policy" {
     max_expansion    = number
     max_deleting     = optional(number)
     max_creating     = optional(number)
-    startup_duration = optional(string)
+    startup_duration = optional(number)
     strategy         = optional(string, "proactive")
   })
   default = {
@@ -195,6 +255,12 @@ variable "core_fraction" {
   description = "Core fraction applied to instance"
   type        = number
   default     = null
+}
+
+variable "gpus" {
+  description = "Number of GPU devices for the instance"
+  type        = number
+  default     = 0
 }
 
 #
