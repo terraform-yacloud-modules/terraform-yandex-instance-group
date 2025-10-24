@@ -53,7 +53,7 @@ resource "yandex_compute_instance_group" "vm_group" {
 
   scale_policy {
     fixed_scale {
-      size = 3
+      size = 1
     }
   }
 
@@ -87,18 +87,6 @@ resource "yandex_iam_service_account" "vm_sa" {
 
 resource "yandex_resourcemanager_folder_iam_member" "vm_sa_editor" {
   folder_id = coalesce(var.folder_id, data.yandex_client_config.client.folder_id)
-  role      = "editor"
-  member    = "serviceAccount:${yandex_iam_service_account.vm_sa.id}"
-}
-
-resource "yandex_resourcemanager_folder_iam_member" "vm_sa_compute_admin" {
-  folder_id = coalesce(var.folder_id, data.yandex_client_config.client.folder_id)
-  role      = "compute.admin"
-  member    = "serviceAccount:${yandex_iam_service_account.vm_sa.id}"
-}
-
-resource "yandex_resourcemanager_folder_iam_member" "vm_sa_vpc_user" {
-  folder_id = coalesce(var.folder_id, data.yandex_client_config.client.folder_id)
-  role      = "vpc.user"
+  role      = "admin"
   member    = "serviceAccount:${yandex_iam_service_account.vm_sa.id}"
 }
