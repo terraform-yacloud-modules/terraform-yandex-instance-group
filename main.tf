@@ -46,7 +46,7 @@ resource "yandex_compute_instance_group" "this" {
 
   scale_policy {
     fixed_scale {
-      size = 1
+      size = var.instance_count
     }
   }
 

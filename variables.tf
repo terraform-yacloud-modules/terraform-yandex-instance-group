@@ -87,6 +87,12 @@ variable "boot_disk_initialize_params" {
   default = {}
 }
 
+variable "instance_count" {
+  description = "Number of instances in the instance group"
+  type        = number
+  default     = 1
+}
+
 variable "secondary_disks" {
   description = "Additional disks with params"
   type = map(object({

@@ -26,7 +26,11 @@ module "network" {
 
   azs = ["ru-central1-a", "ru-central1-b", "ru-central1-d"]
 
-  private_subnets = [["10.4.0.0/24"]]
+  private_subnets = [
+    ["10.4.1.0/24"],  # ru-central1-a
+    ["10.4.2.0/24"],  # ru-central1-b
+    ["10.4.3.0/24"]   # ru-central1-d
+  ]
 
   create_vpc         = true
   create_nat_gateway = true
@@ -35,12 +39,13 @@ module "network" {
 module "yandex_compute_instance" {
   source = "../../"
 
-  zones = ["ru-central1-a"]
+  zones = ["ru-central1-a", "ru-central1-b", "ru-central1-d"]
+  instance_count = 3
 
   name = "example-instance-group"
 
   network_id = module.network.vpc_id
-  subnet_ids = [module.network.private_subnets_ids[0]]
+  subnet_ids = module.network.private_subnets_ids
   enable_nat = true
 
   service_account_id = module.iam_accounts.id
