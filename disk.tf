@@ -11,14 +11,4 @@ resource "yandex_compute_disk" "main" {
   size       = each.value["size"]
   block_size = each.value["block_size"]
   type       = each.value["type"]
-
-  dynamic "timeouts" {
-    for_each = var.timeouts == null ? [] : [var.timeouts]
-    content {
-      create = try(timeouts.value.create, null)
-      update = try(timeouts.value.update, null)
-      delete = try(timeouts.value.delete, null)
-    }
-  }
-
 }

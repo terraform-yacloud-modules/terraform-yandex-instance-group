@@ -1,6 +1,3 @@
-#
-# yandex cloud coordinates
-#
 variable "folder_id" {
   description = "Folder ID where the instance group will be created"
   type        = string
@@ -13,24 +10,9 @@ variable "zones" {
   default     = []
 }
 
-#
-# naming
-#
 variable "name" {
   description = "Name which will be used for all resources"
   type        = string
-}
-
-variable "instance_group_description" {
-  description = "Instance group description"
-  type        = string
-  default     = null
-}
-
-variable "instance_description" {
-  description = "Instance description"
-  type        = string
-  default     = null
 }
 
 variable "labels" {
@@ -39,9 +21,6 @@ variable "labels" {
   default     = {}
 }
 
-#
-# network
-#
 variable "network_id" {
   description = "Network ID"
   type        = string
@@ -66,175 +45,8 @@ variable "security_group_ids" {
   default     = null
 }
 
-variable "network_acceleration_type" {
-  description = "Network acceleration type"
-  type        = string
-  default     = "STANDARD"
-}
-
-variable "network_interface_dns_records" {
-  description = "DNS records configuration for network interface"
-  type = list(object({
-    dns_zone_id = optional(string)
-    fqdn        = string
-    ptr         = optional(bool, false)
-    ttl         = optional(number, 300)
-  }))
-  default = []
-}
-
-variable "network_interface_ipv6_dns_records" {
-  description = "IPv6 DNS records configuration for network interface"
-  type = list(object({
-    dns_zone_id = optional(string)
-    fqdn        = string
-    ptr         = optional(bool, false)
-    ttl         = optional(number, 300)
-  }))
-  default = []
-}
-
-variable "network_interface_nat_dns_records" {
-  description = "NAT DNS records configuration for network interface"
-  type = list(object({
-    dns_zone_id = optional(string)
-    fqdn        = string
-    ptr         = optional(bool, false)
-    ttl         = optional(number, 300)
-  }))
-  default = []
-}
-
-variable "serial_port_enable" {
-  description = "Enable serial port on instances"
-  type        = bool
-  default     = false
-}
-
-variable "metadata_options" {
-  description = "Metadata options configuration for accessing instance metadata"
-  type = object({
-    aws_v1_http_endpoint = optional(number, 1)
-    aws_v1_http_token    = optional(number, 1)
-    gce_http_endpoint    = optional(number, 1)
-    gce_http_token       = optional(number, 1)
-  })
-  default = {}
-}
-
-variable "filesystems" {
-  description = "Filesystems to attach to instances"
-  type = map(object({
-    filesystem_id = string
-    device_name   = optional(string)
-    mode          = optional(string, "READ_WRITE")
-  }))
-  default = {}
-}
-
-#
-# Instance group options
-#
-variable "variables" {
-  description = "A set of key/value variables pairs to assign to the instance group"
-  type        = map(string)
-  default     = {}
-}
-
-variable "deletion_protection" {
-  description = "Flag that protects the instance group from accidental deletion"
-  type        = bool
-  default     = false
-}
-
-variable "scale" {
-  description = "Instance group scaling policy"
-  type = object({
-    fixed = optional(object({
-      size = number
-    }), null)
-    auto = optional(object({
-      initial_size           = number
-      measurement_duration   = number
-      cpu_utilization_target = string
-      min_zone_size          = number
-      max_size               = number
-      warmup_duration        = string
-      stabilization_duration = string
-    }), null)
-
-  })
-  default = {
-    fixed = {
-      size = 1
-    }
-  }
-}
-
-variable "deploy_policy" {
-  description = "Instance group deploy policy"
-  type = object({
-    max_unavailable  = number
-    max_expansion    = number
-    max_deleting     = optional(number)
-    max_creating     = optional(number)
-    startup_duration = optional(number)
-    strategy         = optional(string, "proactive")
-  })
-  default = {
-    max_unavailable = 1
-    max_expansion   = 1
-  }
-}
-
-variable "enable_nlb_integration" {
-  description = "If true, Network load balancer integration will be created"
-  type        = bool
-  default     = false
-}
-
-variable "enable_alb_integration" {
-  description = "If true, Application load balancer integration will be created"
-  type        = bool
-  default     = false
-}
-
-variable "max_checking_health_duration" {
-  description = "Timeout for waiting for the VM to become healthy"
-  type        = number
-  default     = 10
-}
-
-variable "health_check" {
-  description = "Health check configuration"
-  type = object({
-    enabled             = optional(bool, false)
-    interval            = optional(number, 15)
-    timeout             = optional(number, 10)
-    healthy_threshold   = optional(number, 3)
-    unhealthy_threshold = optional(number, 3)
-    tcp_options = optional(object({
-      port = number
-    }), null)
-    http_options = optional(object({
-      port = number,
-      path = string
-    }), null)
-  })
-  default = {
-    enabled = true
-    tcp_options = {
-      port = 8080
-    }
-  }
-}
-
-
-#
-# VMs size
-#
 variable "platform_id" {
-  description = "Hardware CPU platform name (Intel Ice Lake by default)"
+  description = "Hardware CPU platform name"
   type        = string
   default     = "standard-v3"
 }
@@ -251,73 +63,14 @@ variable "memory" {
   default     = 2
 }
 
-variable "core_fraction" {
-  description = "Core fraction applied to instance"
-  type        = number
-  default     = null
-}
-
-variable "gpus" {
-  description = "Number of GPU devices for the instance"
-  type        = number
-  default     = 0
-}
-
-#
-# scheduling
-#
 variable "preemptible" {
   description = "Make instance preemptible"
   type        = bool
   default     = false
 }
 
-# variable "placement_group_id" {
-#   description = "Placement group ID"
-#   type        = string
-#   default     = null
-# }
-#
-# variable "placement_affinity_rules" {
-#   description = "List of host affinity rules"
-#   type = list(object({
-#     key   = string
-#     op    = string
-#     value = string
-#   }))
-#   default = []
-# }
-
-#
-# vm image
-#
-variable "image_snapshot_id" {
-  description = <<-EOT
-Image snapshot id to initialize from.
-Highest priority over var.image_id
-and var.image_family"
-EOT
-  type        = string
-  default     = null
-}
-
 variable "image_id" {
-  description = "Image ID (medium priority)"
-  type        = string
-  default     = null
-}
-
-variable "image_family" {
-  description = "Default image family name (lowest priority)"
-  type        = string
-  default     = "ubuntu-2004-lts"
-}
-
-#
-# vm options
-#
-variable "hostname" {
-  description = "Hostname of the instance. More info: https://cloud.yandex.ru/docs/compute/concepts/network#hostname"
+  description = "Image ID"
   type        = string
   default     = null
 }
@@ -328,33 +81,6 @@ variable "service_account_id" {
   default     = null
 }
 
-variable "generate_ssh_key" {
-  description = "If true, SSH key will be generated for instance group"
-  type        = string
-  default     = true
-}
-
-variable "ssh_user" {
-  description = "Initial SSH username for instance"
-  type        = string
-  default     = "ubuntu"
-}
-
-variable "ssh_pubkey" {
-  description = "Public RSA key path to inject"
-  type        = string
-  default     = null
-}
-
-variable "user_data" {
-  description = "Cloud-init user-data"
-  type        = string
-  default     = null
-}
-
-#
-# vm disks
-#
 variable "boot_disk" {
   description = "Basic boot disk parameters"
   type = object({
@@ -383,19 +109,8 @@ variable "secondary_disks" {
     size        = optional(number, 10)
     block_size  = optional(number, 4096)
     type        = optional(string, "network-hdd")
-
     mode        = optional(string, "READ_WRITE")
     device_name = optional(string, "data")
   }))
   default = {}
-}
-
-variable "timeouts" {
-  description = "Timeout settings for cluster operations"
-  type = object({
-    create = optional(string)
-    update = optional(string)
-    delete = optional(string)
-  })
-  default = null
 }

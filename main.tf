@@ -1,81 +1,26 @@
-data "yandex_client_config" "client" {}
-
-locals {
-  use_snapshot = var.image_snapshot_id != null ? true : false
-  image_id = (
-    coalesce(
-      var.image_id,
-      data.yandex_compute_image.this.id
-  ))
-  ssh_keys = var.generate_ssh_key ? "${var.ssh_user}:${tls_private_key.this[0].public_key_openssh}" : (var.ssh_pubkey != null ? "${var.ssh_user}:${file(var.ssh_pubkey)}" : null)
-
-}
-
-resource "tls_private_key" "this" {
-  count = var.generate_ssh_key ? 1 : 0
-
-  algorithm = "RSA"
-}
-
 resource "yandex_compute_instance_group" "this" {
   name        = var.name
-  description = var.instance_group_description
   labels      = var.labels
-  variables   = var.variables
 
-  folder_id           = coalesce(var.folder_id, data.yandex_client_config.client.folder_id)
+  folder_id           = var.folder_id
   service_account_id  = var.service_account_id
-  deletion_protection = var.deletion_protection
 
   instance_template {
     name        = format("%s-{instance.index}", var.name)
-    description = var.instance_description
     labels      = var.labels
 
-    hostname           = format("%s-{instance.index}", var.hostname)
     service_account_id = var.service_account_id
 
-    metadata = {
-      serial-port-enable = var.serial_port_enable ? 1 : null
-      ssh-keys           = local.ssh_keys
-      user-data          = var.user_data
-    }
-
-    dynamic "metadata_options" {
-      for_each = length(keys(var.metadata_options)) > 0 ? [var.metadata_options] : []
-      content {
-        aws_v1_http_endpoint = metadata_options.value.aws_v1_http_endpoint
-        aws_v1_http_token    = metadata_options.value.aws_v1_http_token
-        gce_http_endpoint    = metadata_options.value.gce_http_endpoint
-        gce_http_token       = metadata_options.value.gce_http_token
-      }
-    }
+    metadata = {}
 
     platform_id = var.platform_id
     scheduling_policy {
       preemptible = var.preemptible
     }
 
-    # TODO
-    #  placement_policy {
-    #    placement_group_id = var.placement_group_id
-    #
-    #    dynamic "host_affinity_rules" {
-    #      for_each = var.placement_affinity_rules
-    #
-    #      content {
-    #        key   = host_affinity_rules.value["key"]
-    #        op    = host_affinity_rules.value["op"]
-    #        value = host_affinity_rules.value["value"]
-    #      }
-    #    }
-    #  }
-
     resources {
-      cores         = var.cores
-      memory        = var.memory
-      core_fraction = var.core_fraction
-      gpus          = var.gpus
+      cores  = var.cores
+      memory = var.memory
     }
 
     boot_disk {
@@ -86,8 +31,7 @@ resource "yandex_compute_instance_group" "this" {
         description = ""
         size        = var.boot_disk_initialize_params.size
         type        = var.boot_disk_initialize_params.type
-        image_id    = local.use_snapshot ? null : local.image_id
-        snapshot_id = local.use_snapshot ? var.image_snapshot_id : null
+        image_id    = var.image_id
       }
     }
 
@@ -100,122 +44,17 @@ resource "yandex_compute_instance_group" "this" {
       }
     }
 
-    dynamic "filesystem" {
-      for_each = var.filesystems
-      content {
-        filesystem_id = filesystem.value.filesystem_id
-        device_name   = filesystem.value.device_name
-        mode          = filesystem.value.mode
-      }
-    }
-
     network_interface {
       network_id         = var.network_id
       subnet_ids         = var.subnet_ids
       nat                = var.enable_nat
       security_group_ids = var.security_group_ids
-
-      dynamic "dns_record" {
-        for_each = var.network_interface_dns_records
-        content {
-          dns_zone_id = dns_record.value.dns_zone_id
-          fqdn        = dns_record.value.fqdn
-          ptr         = dns_record.value.ptr
-          ttl         = dns_record.value.ttl
-        }
-      }
-
-      dynamic "ipv6_dns_record" {
-        for_each = var.network_interface_ipv6_dns_records
-        content {
-          dns_zone_id = ipv6_dns_record.value.dns_zone_id
-          fqdn        = ipv6_dns_record.value.fqdn
-          ptr         = ipv6_dns_record.value.ptr
-          ttl         = ipv6_dns_record.value.ttl
-        }
-      }
-
-      dynamic "nat_dns_record" {
-        for_each = var.network_interface_nat_dns_records
-        content {
-          dns_zone_id = nat_dns_record.value.dns_zone_id
-          fqdn        = nat_dns_record.value.fqdn
-          ptr         = nat_dns_record.value.ptr
-          ttl         = nat_dns_record.value.ttl
-        }
-      }
-    }
-
-    network_settings {
-      type = var.network_acceleration_type
     }
   }
 
   scale_policy {
-    dynamic "fixed_scale" {
-      for_each = lookup(var.scale, "fixed", null) != null ? [1] : []
-      content {
-        size = var.scale.fixed.size
-      }
-    }
-
-    dynamic "auto_scale" {
-      for_each = lookup(var.scale, "auto", null) != null ? [1] : []
-      content {
-        initial_size           = var.scale.auto.initial_size
-        measurement_duration   = var.scale.auto.measurement_duration
-        cpu_utilization_target = var.scale.auto.cpu_utilization_target
-        min_zone_size          = var.scale.auto.min_zone_size
-        max_size               = var.scale.auto.max_size
-        warmup_duration        = var.scale.auto.warmup_duration
-        stabilization_duration = var.scale.auto.stabilization_duration
-      }
-    }
-  }
-
-  max_checking_health_duration = var.max_checking_health_duration
-  dynamic "health_check" {
-    for_each = var.health_check["enabled"] ? [1] : []
-    content {
-      interval            = var.health_check["interval"]
-      timeout             = var.health_check["timeout"]
-      healthy_threshold   = var.health_check["healthy_threshold"]
-      unhealthy_threshold = var.health_check["unhealthy_threshold"]
-
-      dynamic "tcp_options" {
-        for_each = var.health_check.tcp_options != null ? [1] : []
-        content {
-          port = var.health_check.tcp_options.port
-        }
-      }
-
-      dynamic "http_options" {
-        for_each = var.health_check.http_options != null ? [1] : []
-        content {
-          port = var.health_check.http_options.port
-          path = var.health_check.http_options.path
-        }
-      }
-    }
-  }
-
-  dynamic "application_load_balancer" {
-    for_each = var.enable_alb_integration ? [1] : []
-    content {
-      target_group_name            = var.name
-      target_group_description     = ""
-      target_group_labels          = var.labels
-      max_opening_traffic_duration = 300
-    }
-  }
-
-  dynamic "load_balancer" {
-    for_each = var.enable_nlb_integration ? [1] : []
-    content {
-      target_group_name            = var.name
-      target_group_description     = ""
-      target_group_labels          = var.labels
-      max_opening_traffic_duration = 300
+    fixed_scale {
+      size = 1
     }
   }
 
@@ -224,21 +63,7 @@ resource "yandex_compute_instance_group" "this" {
   }
 
   deploy_policy {
-    max_unavailable  = var.deploy_policy.max_unavailable
-    max_expansion    = var.deploy_policy.max_expansion
-    max_deleting     = var.deploy_policy.max_deleting
-    max_creating     = var.deploy_policy.max_creating
-    startup_duration = var.deploy_policy.startup_duration
-    strategy         = var.deploy_policy.strategy
+    max_unavailable = 1
+    max_expansion   = 1
   }
-
-  dynamic "timeouts" {
-    for_each = var.timeouts == null ? [] : [var.timeouts]
-    content {
-      create = try(timeouts.value.create, null)
-      update = try(timeouts.value.update, null)
-      delete = try(timeouts.value.delete, null)
-    }
-  }
-
 }
