@@ -3,10 +3,7 @@ resource "yandex_compute_disk" "main" {
     for k, v in var.secondary_disks : k => v if v["enabled"]
   }
 
-  name        = format("%s-%s", var.name, each.key)
-  description = each.value["description"]
-  labels      = merge(var.labels, each.value["labels"])
-
+  name       = format("%s-%s", var.name, each.key)
   zone       = each.value["zone"]
   size       = each.value["size"]
   block_size = each.value["block_size"]

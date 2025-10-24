@@ -15,12 +15,6 @@ variable "name" {
   type        = string
 }
 
-variable "labels" {
-  description = "A set of labels which will be applied to all resources"
-  type        = map(string)
-  default     = {}
-}
-
 variable "network_id" {
   description = "Network ID"
   type        = string
@@ -63,12 +57,6 @@ variable "memory" {
   default     = 2
 }
 
-variable "preemptible" {
-  description = "Make instance preemptible"
-  type        = bool
-  default     = false
-}
-
 variable "image_id" {
   description = "Image ID"
   type        = string
@@ -104,7 +92,6 @@ variable "secondary_disks" {
   type = map(object({
     enabled     = optional(bool, true)
     description = optional(string, "")
-    labels      = optional(map(string), {})
     zone        = optional(string, null)
     size        = optional(number, 10)
     block_size  = optional(number, 4096)

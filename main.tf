@@ -1,22 +1,15 @@
 resource "yandex_compute_instance_group" "this" {
-  name   = var.name
-  labels = var.labels
+  name = var.name
 
   folder_id          = var.folder_id
   service_account_id = var.service_account_id
 
   instance_template {
-    name   = format("%s-{instance.index}", var.name)
-    labels = var.labels
+    name = format("%s-{instance.index}", var.name)
 
     service_account_id = var.service_account_id
 
-    metadata = {}
-
     platform_id = var.platform_id
-    scheduling_policy {
-      preemptible = var.preemptible
-    }
 
     resources {
       cores  = var.cores
@@ -28,10 +21,9 @@ resource "yandex_compute_instance_group" "this" {
       device_name = var.boot_disk.device_name
 
       initialize_params {
-        description = ""
-        size        = var.boot_disk_initialize_params.size
-        type        = var.boot_disk_initialize_params.type
-        image_id    = var.image_id
+        size     = var.boot_disk_initialize_params.size
+        type     = var.boot_disk_initialize_params.type
+        image_id = var.image_id
       }
     }
 
