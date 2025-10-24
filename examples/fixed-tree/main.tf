@@ -122,14 +122,32 @@ module "yandex_compute_instance" {
   }
 
   secondary_disks = {
-    data-disk = {
+    data-disk-a = {
       enabled     = true
-      description = "Additional data disk"
+      description = "Additional data disk in zone A"
       size        = 20
       type        = "network-hdd"
       mode        = "READ_WRITE"
       device_name = "data"
       zone        = "ru-central1-a"
+    }
+    data-disk-b = {
+      enabled     = true
+      description = "Additional data disk in zone B"
+      size        = 20
+      type        = "network-hdd"
+      mode        = "READ_WRITE"
+      device_name = "data"
+      zone        = "ru-central1-b"
+    }
+    data-disk-d = {
+      enabled     = true
+      description = "Additional data disk in zone D"
+      size        = 20
+      type        = "network-hdd"
+      mode        = "READ_WRITE"
+      device_name = "data"
+      zone        = "ru-central1-d"
     }
   }
 
