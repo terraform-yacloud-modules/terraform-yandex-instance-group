@@ -42,7 +42,11 @@ resource "yandex_compute_instance_group" "vm_group" {
 
     network_interface {
       network_id = yandex_vpc_network.vm_network.id
-      subnet_ids = [yandex_vpc_subnet.vm_subnet.id]
+      subnet_ids = [
+        yandex_vpc_subnet.vm_subnet-a.id,
+        yandex_vpc_subnet.vm_subnet-b.id, 
+        yandex_vpc_subnet.vm_subnet-d.id
+      ]
       nat        = true
     }
 
@@ -53,12 +57,12 @@ resource "yandex_compute_instance_group" "vm_group" {
 
   scale_policy {
     fixed_scale {
-      size = 1
+      size = 3
     }
   }
 
   allocation_policy {
-    zones = ["ru-central1-a"]
+    zones = ["ru-central1-a", "ru-central1-b", "ru-central1-d"]
   }
 
   deploy_policy {
@@ -70,7 +74,9 @@ resource "yandex_compute_instance_group" "vm_group" {
 
   depends_on = [
     yandex_vpc_network.vm_network,
-    yandex_vpc_subnet.vm_subnet,
+    yandex_vpc_subnet.vm_subnet-a,
+    yandex_vpc_subnet.vm_subnet-b,
+    yandex_vpc_subnet.vm_subnet-d,
     yandex_iam_service_account.vm_sa,
     yandex_resourcemanager_folder_iam_member.vm_sa_editor,
     yandex_resourcemanager_folder_iam_member.vm_sa_vpc_public_admin
@@ -81,11 +87,25 @@ resource "yandex_vpc_network" "vm_network" {
   name = "vm-network"
 }
 
-resource "yandex_vpc_subnet" "vm_subnet" {
-  name           = "vm-subnet"
+resource "yandex_vpc_subnet" "vm_subnet-a" {
+  name           = "vm-subnet-a"
   zone           = "ru-central1-a"
   network_id     = yandex_vpc_network.vm_network.id
   v4_cidr_blocks = ["192.168.10.0/24"]
+}
+
+resource "yandex_vpc_subnet" "vm_subnet-b" {
+  name           = "vm-subnet-b"
+  zone           = "ru-central1-b"
+  network_id     = yandex_vpc_network.vm_network.id
+  v4_cidr_blocks = ["192.168.20.0/24"]
+}
+
+resource "yandex_vpc_subnet" "vm_subnet-d" {
+  name           = "vm-subnet-d"
+  zone           = "ru-central1-d"
+  network_id     = yandex_vpc_network.vm_network.id
+  v4_cidr_blocks = ["192.168.30.0/24"]
 }
 
 resource "yandex_iam_service_account" "vm_sa" {
