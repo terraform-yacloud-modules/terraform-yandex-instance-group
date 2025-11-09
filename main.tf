@@ -1,195 +1,132 @@
-locals {
-  use_snapshot = var.image_snapshot_id != null ? true : false
-  image_id = (
-    coalesce(
-      var.image_id,
-      data.yandex_compute_image.this.id
-  ))
-  ssh_keys = var.generate_ssh_key ? "${var.ssh_user}:${tls_private_key.this[0].public_key_openssh}" : (var.ssh_pubkey != null ? "${var.ssh_user}:${file(var.ssh_pubkey)}" : null)
-
+terraform {
+  required_providers {
+    yandex = {
+      source  = "yandex-cloud/yandex"
+      version = ">= 0.168.0"
+    }
+  }
 }
 
-resource "tls_private_key" "this" {
-  count = var.generate_ssh_key ? 1 : 0
+data "yandex_client_config" "client" {}
 
-  algorithm = "RSA"
-}
-
-resource "yandex_compute_instance_group" "this" {
-  name        = var.name
-  description = var.instance_group_description
-  labels      = var.labels
-  variables   = var.variables
-
-  service_account_id  = var.service_account_id
-  deletion_protection = var.deletion_protection
+resource "yandex_compute_instance_group" "vm_group" {
+  name                = "vm-group-with-secondary-disks"
+  folder_id           = coalesce(var.folder_id, data.yandex_client_config.client.folder_id)
+  service_account_id  = yandex_iam_service_account.vm_sa.id
+  deletion_protection = false
 
   instance_template {
-    name        = format("%s-{instance.index}", var.name)
-    description = var.instance_description
-    labels      = var.labels
-
-    hostname           = format("%s-{instance.index}", var.hostname)
-    service_account_id = var.service_account_id
-
-    metadata = {
-      serial-port-enable = var.serial_port_enable ? 1 : null
-      ssh-keys           = local.ssh_keys
-      user-data          = var.user_data
-    }
-
-    platform_id = var.platform_id
-    scheduling_policy {
-      preemptible = var.preemptible
-    }
-
-    # TODO
-    #  placement_policy {
-    #    placement_group_id = var.placement_group_id
-    #
-    #    dynamic "host_affinity_rules" {
-    #      for_each = var.placement_affinity_rules
-    #
-    #      content {
-    #        key   = host_affinity_rules.value["key"]
-    #        op    = host_affinity_rules.value["op"]
-    #        value = host_affinity_rules.value["value"]
-    #      }
-    #    }
-    #  }
-
+    platform_id = "standard-v3"
     resources {
-      cores         = var.cores
-      memory        = var.memory
-      core_fraction = var.core_fraction
+      memory = 2
+      cores  = 2
     }
 
     boot_disk {
-      mode        = var.boot_disk.mode
-      device_name = var.boot_disk.device_name
-
+      mode = "READ_WRITE"
       initialize_params {
-        description = ""
-        size        = var.boot_disk_initialize_params.size
-        type        = var.boot_disk_initialize_params.type
-        image_id    = local.use_snapshot ? null : local.image_id
-        snapshot_id = local.use_snapshot ? var.image_snapshot_id : null
+        image_id = "fd8vmcue7aajpmeo39kk" # Ubuntu 20.04 LTS
+        size     = 10
+        type     = "network-hdd"
       }
     }
 
-    dynamic "secondary_disk" {
-      for_each = var.secondary_disks
-
-      iterator = disk
-      content {
-        disk_id = yandex_compute_disk.main[disk.key].id
+    # Второй диск для каждой VM
+    secondary_disk {
+      mode = "READ_WRITE"
+      initialize_params {
+        size = 20
+        type = "network-hdd"
       }
     }
 
     network_interface {
-      network_id         = var.network_id
-      subnet_ids         = var.subnet_ids
-      nat                = var.enable_nat
-      security_group_ids = var.security_group_ids
-
-      # dns_record {}
-      # ipv6_dns_record{}
-      # nat_dns_record {}
+      network_id = yandex_vpc_network.vm_network.id
+      subnet_ids = [
+        yandex_vpc_subnet.vm_subnet-a.id,
+        yandex_vpc_subnet.vm_subnet-b.id, 
+        yandex_vpc_subnet.vm_subnet-d.id
+      ]
+      nat        = true
     }
 
-    network_settings {
-      type = var.network_acceleration_type
+    metadata = {
+      ssh-keys = "ubuntu:${file("~/.ssh/id_rsa.pub")}"
     }
   }
 
   scale_policy {
-    dynamic "fixed_scale" {
-      for_each = lookup(var.scale, "fixed", null) != null ? [1] : []
-      content {
-        size = var.scale.fixed.size
-      }
-    }
-
-    dynamic "auto_scale" {
-      for_each = lookup(var.scale, "auto", null) != null ? [1] : []
-      content {
-        initial_size           = var.scale.auto.initial_size
-        measurement_duration   = var.scale.auto.measurement_duration
-        cpu_utilization_target = var.scale.auto.cpu_utilization_target
-        min_zone_size          = var.scale.auto.min_zone_size
-        max_size               = var.scale.auto.max_size
-        warmup_duration        = var.scale.auto.warmup_duration
-        stabilization_duration = var.scale.auto.stabilization_duration
-      }
-    }
-  }
-
-  max_checking_health_duration = var.max_checking_health_duration
-  dynamic "health_check" {
-    for_each = var.health_check["enabled"] ? [1] : []
-    content {
-      interval            = var.health_check["interval"]
-      timeout             = var.health_check["timeout"]
-      healthy_threshold   = var.health_check["healthy_threshold"]
-      unhealthy_threshold = var.health_check["unhealthy_threshold"]
-
-      dynamic "tcp_options" {
-        for_each = var.health_check.tcp_options != null ? [1] : []
-        content {
-          port = var.health_check.tcp_options.port
-        }
-      }
-
-      dynamic "http_options" {
-        for_each = var.health_check.http_options != null ? [1] : []
-        content {
-          port = var.health_check.http_options.port
-          path = var.health_check.http_options.path
-        }
-      }
-    }
-  }
-
-  dynamic "application_load_balancer" {
-    for_each = var.enable_alb_integration ? [1] : []
-    content {
-      target_group_name            = var.name
-      target_group_description     = ""
-      target_group_labels          = var.labels
-      max_opening_traffic_duration = 300
-    }
-  }
-
-  dynamic "load_balancer" {
-    for_each = var.enable_nlb_integration ? [1] : []
-    content {
-      target_group_name            = var.name
-      target_group_description     = ""
-      target_group_labels          = var.labels
-      max_opening_traffic_duration = 300
+    fixed_scale {
+      size = 3
     }
   }
 
   allocation_policy {
-    zones = var.zones
+    zones = ["ru-central1-a", "ru-central1-b", "ru-central1-d"]
   }
 
   deploy_policy {
-    max_unavailable  = var.deploy_policy.max_unavailable
-    max_expansion    = var.deploy_policy.max_expansion
-    max_deleting     = var.deploy_policy.max_deleting
-    max_creating     = var.deploy_policy.max_creating
-    startup_duration = var.deploy_policy.startup_duration
-    strategy         = var.deploy_policy.strategy
+    max_unavailable = 1
+    max_creating    = 1
+    max_expansion   = 1
+    max_deleting    = 1
   }
 
-  dynamic "timeouts" {
-    for_each = var.timeouts == null ? [] : [var.timeouts]
-    content {
-      create = try(timeouts.value.create, null)
-      update = try(timeouts.value.update, null)
-      delete = try(timeouts.value.delete, null)
-    }
-  }
+  depends_on = [
+    yandex_vpc_network.vm_network,
+    yandex_vpc_subnet.vm_subnet-a,
+    yandex_vpc_subnet.vm_subnet-b,
+    yandex_vpc_subnet.vm_subnet-d,
+    yandex_iam_service_account.vm_sa,
+    yandex_resourcemanager_folder_iam_member.vm_sa_editor,
+    yandex_resourcemanager_folder_iam_member.vm_sa_vpc_public_admin
+  ]
+}
 
+resource "yandex_vpc_network" "vm_network" {
+  name = "vm-network"
+}
+
+resource "yandex_vpc_subnet" "vm_subnet-a" {
+  name           = "vm-subnet-a"
+  zone           = "ru-central1-a"
+  network_id     = yandex_vpc_network.vm_network.id
+  v4_cidr_blocks = ["192.168.10.0/24"]
+}
+
+resource "yandex_vpc_subnet" "vm_subnet-b" {
+  name           = "vm-subnet-b"
+  zone           = "ru-central1-b"
+  network_id     = yandex_vpc_network.vm_network.id
+  v4_cidr_blocks = ["192.168.20.0/24"]
+}
+
+resource "yandex_vpc_subnet" "vm_subnet-d" {
+  name           = "vm-subnet-d"
+  zone           = "ru-central1-d"
+  network_id     = yandex_vpc_network.vm_network.id
+  v4_cidr_blocks = ["192.168.30.0/24"]
+}
+
+resource "yandex_iam_service_account" "vm_sa" {
+  name        = "vm-service-account"
+  description = "Service account for VM instances"
+}
+
+resource "yandex_resourcemanager_folder_iam_member" "vm_sa_editor" {
+  folder_id = coalesce(var.folder_id, data.yandex_client_config.client.folder_id)
+  role      = "compute.editor"
+  member    = "serviceAccount:${yandex_iam_service_account.vm_sa.id}"
+}
+
+resource "yandex_resourcemanager_folder_iam_member" "vm_sa_vpc_public_admin" {
+  folder_id = coalesce(var.folder_id, data.yandex_client_config.client.folder_id)
+  role      = "vpc.publicAdmin"
+  member    = "serviceAccount:${yandex_iam_service_account.vm_sa.id}"
+}
+
+variable "folder_id" {
+  description = "ID of the folder to create the cluster in"
+  type        = string
+  default     = null
 }
