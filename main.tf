@@ -2,7 +2,7 @@ terraform {
   required_providers {
     yandex = {
       source  = "yandex-cloud/yandex"
-      version = ">= 0.85.0"
+      version = ">= 0.168.0"
     }
   }
 }
@@ -67,6 +67,14 @@ resource "yandex_compute_instance_group" "vm_group" {
     max_expansion   = 1
     max_deleting    = 1
   }
+
+  depends_on = [
+    yandex_vpc_network.vm_network,
+    yandex_vpc_subnet.vm_subnet,
+    yandex_iam_service_account.vm_sa,
+    yandex_resourcemanager_folder_iam_member.vm_sa_editor,
+    yandex_resourcemanager_folder_iam_member.vm_sa_vpc_public_admin
+  ]
 }
 
 resource "yandex_vpc_network" "vm_network" {
@@ -87,6 +95,18 @@ resource "yandex_iam_service_account" "vm_sa" {
 
 resource "yandex_resourcemanager_folder_iam_member" "vm_sa_editor" {
   folder_id = coalesce(var.folder_id, data.yandex_client_config.client.folder_id)
-  role      = "admin"
+  role      = "compute.editor"
   member    = "serviceAccount:${yandex_iam_service_account.vm_sa.id}"
+}
+
+resource "yandex_resourcemanager_folder_iam_member" "vm_sa_vpc_public_admin" {
+  folder_id = coalesce(var.folder_id, data.yandex_client_config.client.folder_id)
+  role      = "vpc.publicAdmin"
+  member    = "serviceAccount:${yandex_iam_service_account.vm_sa.id}"
+}
+
+variable "folder_id" {
+  description = "ID of the folder to create the cluster in"
+  type        = string
+  default     = null
 }
