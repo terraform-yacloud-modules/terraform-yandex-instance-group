@@ -1,15 +1,9 @@
-#
-# yandex cloud coordinates
-#
 variable "zones" {
   description = "A list of availability zones"
   type        = list(string)
   default     = []
 }
 
-#
-# naming
-#
 variable "name" {
   description = "Name which will be used for all resources"
   type        = string
@@ -33,9 +27,6 @@ variable "labels" {
   default     = {}
 }
 
-#
-# network
-#
 variable "network_id" {
   description = "Network ID"
   type        = string
@@ -72,9 +63,6 @@ variable "serial_port_enable" {
   default     = false
 }
 
-#
-# Instance group options
-#
 variable "variables" {
   description = "A set of key/value variables pairs to assign to the instance group"
   type        = map(string)
@@ -169,10 +157,6 @@ variable "health_check" {
   }
 }
 
-
-#
-# VMs size
-#
 variable "platform_id" {
   description = "Hardware CPU platform name (Intel Ice Lake by default)"
   type        = string
@@ -197,34 +181,12 @@ variable "core_fraction" {
   default     = null
 }
 
-#
-# scheduling
-#
 variable "preemptible" {
   description = "Make instance preemptible"
   type        = bool
   default     = false
 }
 
-# variable "placement_group_id" {
-#   description = "Placement group ID"
-#   type        = string
-#   default     = null
-# }
-#
-# variable "placement_affinity_rules" {
-#   description = "List of host affinity rules"
-#   type = list(object({
-#     key   = string
-#     op    = string
-#     value = string
-#   }))
-#   default = []
-# }
-
-#
-# vm image
-#
 variable "image_snapshot_id" {
   description = <<-EOT
 Image snapshot id to initialize from.
@@ -247,9 +209,7 @@ variable "image_family" {
   default     = "ubuntu-2004-lts"
 }
 
-#
-# vm options
-#
+
 variable "hostname" {
   description = "Hostname of the instance. More info: https://cloud.yandex.ru/docs/compute/concepts/network#hostname"
   type        = string
@@ -286,9 +246,6 @@ variable "user_data" {
   default     = null
 }
 
-#
-# vm disks
-#
 variable "boot_disk" {
   description = "Basic boot disk parameters"
   type = object({
