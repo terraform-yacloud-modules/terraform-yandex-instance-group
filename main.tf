@@ -43,21 +43,6 @@ resource "yandex_compute_instance_group" "this" {
       preemptible = var.preemptible
     }
 
-    # TODO
-    #  placement_policy {
-    #    placement_group_id = var.placement_group_id
-    #
-    #    dynamic "host_affinity_rules" {
-    #      for_each = var.placement_affinity_rules
-    #
-    #      content {
-    #        key   = host_affinity_rules.value["key"]
-    #        op    = host_affinity_rules.value["op"]
-    #        value = host_affinity_rules.value["value"]
-    #      }
-    #    }
-    #  }
-
     resources {
       cores         = var.cores
       memory        = var.memory
@@ -91,10 +76,6 @@ resource "yandex_compute_instance_group" "this" {
       subnet_ids         = var.subnet_ids
       nat                = var.enable_nat
       security_group_ids = var.security_group_ids
-
-      # dns_record {}
-      # ipv6_dns_record{}
-      # nat_dns_record {}
     }
 
     network_settings {
