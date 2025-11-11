@@ -4,6 +4,7 @@ resource "yandex_compute_disk" "main" {
   }
 
   name        = format("%s-%s", var.name, each.key)
+  folder_id   = var.folder_id
   description = each.value["description"]
   labels      = merge(var.labels, each.value["labels"])
 
