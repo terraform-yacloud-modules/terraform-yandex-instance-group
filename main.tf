@@ -17,6 +17,7 @@ resource "tls_private_key" "this" {
 
 resource "yandex_compute_instance_group" "this" {
   name        = var.name
+  folder_id   = var.folder_id
   description = var.instance_group_description
   labels      = var.labels
   variables   = var.variables
@@ -62,6 +63,7 @@ resource "yandex_compute_instance_group" "this" {
       cores         = var.cores
       memory        = var.memory
       core_fraction = var.core_fraction
+      gpus          = var.gpus
     }
 
     boot_disk {

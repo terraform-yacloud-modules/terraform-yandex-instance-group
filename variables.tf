@@ -7,6 +7,12 @@ variable "zones" {
   default     = []
 }
 
+variable "folder_id" {
+  description = "The folder identifier that resources belongs to"
+  type        = string
+  default     = null
+}
+
 #
 # naming
 #
@@ -174,7 +180,7 @@ variable "health_check" {
 # VMs size
 #
 variable "platform_id" {
-  description = "Hardware CPU platform name (Intel Ice Lake by default)"
+  description = "Hardware platform name (Intel Ice Lake by default)"
   type        = string
   default     = "standard-v3"
 }
@@ -193,6 +199,12 @@ variable "memory" {
 
 variable "core_fraction" {
   description = "Core fraction applied to instance"
+  type        = number
+  default     = null
+}
+
+variable "gpus" {
+  description = "Nunber of gpus attached to instance"
   type        = number
   default     = null
 }
