@@ -10,6 +10,7 @@ variable "zones" {
 variable "folder_id" {
   description = "The folder identifier that resources belongs to"
   type        = string
+  default     = null
 }
 
 #
