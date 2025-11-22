@@ -15,6 +15,11 @@ variable "name" {
   type        = string
 }
 
+variable "folder_id" {
+  type        = string
+  default     = null
+}
+
 variable "instance_group_description" {
   description = "Instance group description"
   type        = string
@@ -193,6 +198,12 @@ variable "memory" {
 
 variable "core_fraction" {
   description = "Core fraction applied to instance"
+  type        = number
+  default     = null
+}
+
+variable "gpus" {
+  description = "Nunber of gpus attached to instance"
   type        = number
   default     = null
 }

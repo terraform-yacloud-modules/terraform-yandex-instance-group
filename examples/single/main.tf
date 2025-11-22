@@ -62,10 +62,11 @@ module "yandex_compute_instance" {
     }
   }
 
-  platform_id   = "standard-v3"
-  cores         = 2
-  memory        = 4
+  platform_id   = "standard-v3-t4i"
+  cores         = 4
+  memory        = 16
   core_fraction = 100
+  gpus          = 1
 
   image_family = "ubuntu-2004-lts"
 
