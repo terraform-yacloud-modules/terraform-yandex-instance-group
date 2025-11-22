@@ -16,8 +16,8 @@ variable "name" {
 }
 
 variable "folder_id" {
-  type        = string
-  default     = null
+  type    = string
+  default = null
 }
 
 variable "instance_group_description" {
