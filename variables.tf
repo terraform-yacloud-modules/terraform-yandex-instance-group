@@ -179,7 +179,7 @@ variable "health_check" {
 # VMs size
 #
 variable "platform_id" {
-  description = "Hardware CPU platform name (Intel Ice Lake by default)"
+  description = "Hardware platform name (Intel Ice Lake by default)"
   type        = string
   default     = "standard-v3"
 }
