@@ -43,15 +43,37 @@ module "yandex_compute_instance" {
   subnet_ids = [module.network.private_subnets_ids[0]]
   enable_nat = true
 
-  health_check = {
-    enabled = true
-    tcp_options = {
-      port = 80
+  scale = {
+    fixed = {
+      size = 1
     }
   }
 
+  max_checking_health_duration = 10
+
+  health_check = {
+    enabled             = true
+    interval            = 15
+    timeout             = 10
+    healthy_threshold   = 3
+    unhealthy_threshold = 3
+    tcp_options = {
+      port = 22
+    }
+  }
+
+  platform_id   = "standard-v3"
+  cores         = 2
+  memory        = 4
+  core_fraction = 100
+
+  image_family = "ubuntu-2004-lts"
+
+  enable_alb_integration = true
+
   hostname           = "my-instance"
   service_account_id = module.iam_accounts.id
+  ssh_user           = "ubuntu"
   generate_ssh_key   = false
   ssh_pubkey         = "~/.ssh/id_rsa.pub"
 
@@ -64,6 +86,16 @@ module "yandex_compute_instance" {
           - [systemctl, start, nginx]
           - [systemctl, enable, nginx]
         EOF
+
+  boot_disk = {
+    mode        = "READ_WRITE"
+    device_name = "boot"
+  }
+
+  boot_disk_initialize_params = {
+    size = 30
+    type = "network-ssd"
+  }
 
   depends_on = [module.iam_accounts]
 }

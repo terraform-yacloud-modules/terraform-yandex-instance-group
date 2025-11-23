@@ -98,11 +98,4 @@ module "yandex_compute_instance" {
   }
 
   depends_on = [module.iam_accounts]
-
-  timeouts = {
-    create = "30m"
-    update = "30m"
-    delete = "30m"
-  }
-
 }
