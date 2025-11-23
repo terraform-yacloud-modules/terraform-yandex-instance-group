@@ -37,6 +37,7 @@ No modules.
 | [tls_private_key.this](https://registry.terraform.io/providers/hashicorp/tls/latest/docs/resources/private_key) | resource |
 | [yandex_compute_disk.main](https://registry.terraform.io/providers/yandex-cloud/yandex/latest/docs/resources/compute_disk) | resource |
 | [yandex_compute_instance_group.this](https://registry.terraform.io/providers/yandex-cloud/yandex/latest/docs/resources/compute_instance_group) | resource |
+| [yandex_client_config.client](https://registry.terraform.io/providers/yandex-cloud/yandex/latest/docs/data-sources/client_config) | data source |
 | [yandex_compute_image.this](https://registry.terraform.io/providers/yandex-cloud/yandex/latest/docs/data-sources/compute_image) | data source |
 
 ## Inputs
@@ -52,7 +53,9 @@ No modules.
 | <a name="input_enable_alb_integration"></a> [enable\_alb\_integration](#input\_enable\_alb\_integration) | If true, Application load balancer integration will be created | `bool` | `false` | no |
 | <a name="input_enable_nat"></a> [enable\_nat](#input\_enable\_nat) | Enable public IPv4 address | `bool` | `false` | no |
 | <a name="input_enable_nlb_integration"></a> [enable\_nlb\_integration](#input\_enable\_nlb\_integration) | If true, Network load balancer integration will be created | `bool` | `false` | no |
+| <a name="input_folder_id"></a> [folder\_id](#input\_folder\_id) | n/a | `string` | `null` | no |
 | <a name="input_generate_ssh_key"></a> [generate\_ssh\_key](#input\_generate\_ssh\_key) | If true, SSH key will be generated for instance group | `string` | `true` | no |
+| <a name="input_gpus"></a> [gpus](#input\_gpus) | Nunber of gpus attached to instance | `number` | `null` | no |
 | <a name="input_health_check"></a> [health\_check](#input\_health\_check) | Health check configuration | <pre>object({<br/>    enabled             = optional(bool, false)<br/>    interval            = optional(number, 15)<br/>    timeout             = optional(number, 10)<br/>    healthy_threshold   = optional(number, 3)<br/>    unhealthy_threshold = optional(number, 3)<br/>    tcp_options = optional(object({<br/>      port = number<br/>    }), null)<br/>    http_options = optional(object({<br/>      port = number,<br/>      path = string<br/>    }), null)<br/>  })</pre> | <pre>{<br/>  "enabled": true,<br/>  "tcp_options": {<br/>    "port": 8080<br/>  }<br/>}</pre> | no |
 | <a name="input_hostname"></a> [hostname](#input\_hostname) | Hostname of the instance. More info: https://cloud.yandex.ru/docs/compute/concepts/network#hostname | `string` | `null` | no |
 | <a name="input_image_family"></a> [image\_family](#input\_image\_family) | Default image family name (lowest priority) | `string` | `"ubuntu-2004-lts"` | no |

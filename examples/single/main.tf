@@ -66,8 +66,7 @@ module "yandex_compute_instance" {
   cores         = 2
   memory        = 4
   core_fraction = 100
-
-  image_family = "ubuntu-2004-lts"
+  image_family  = "ubuntu-2004-lts"
 
   enable_alb_integration = true
 
