@@ -1,3 +1,7 @@
+## v1.40.0 - 2026-03-11
+### Miscellaneous
+- 19d25bf build(deps): bump hashicorp/setup-terraform from 3 to 4 ([#105](https://github.com/terraform-yacloud-modules/terraform-yandex-instance-group/pull/105))
+
 ## v1.39.0 - 2026-02-21
 ### Miscellaneous
 - 00886c6 Merge pull request [#104](https://github.com/terraform-yacloud-modules/terraform-yandex-instance-group/pull/104) from terraform-yacloud-modules/dependabot/github_actions/kvendingoldo/git-flow-action-2.16.0
