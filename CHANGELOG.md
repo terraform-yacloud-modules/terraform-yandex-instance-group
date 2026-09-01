@@ -1,3 +1,7 @@
+## v1.41.0 - 2026-09-01
+### Miscellaneous
+- 1b6d21b build(deps): bump actions/cache from 5.0.3 to 5.0.5 ([#107](https://github.com/terraform-yacloud-modules/terraform-yandex-instance-group/pull/107))
+
 ## v1.40.0 - 2026-03-11
 ### Miscellaneous
 - 19d25bf build(deps): bump hashicorp/setup-terraform from 3 to 4 ([#105](https://github.com/terraform-yacloud-modules/terraform-yandex-instance-group/pull/105))
