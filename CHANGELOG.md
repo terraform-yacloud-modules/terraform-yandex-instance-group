@@ -1,3 +1,7 @@
+## v1.45.0 - 2026-11-18
+### Miscellaneous
+- 9ae3a2b ci: run semver job only on push to main ([#112](https://github.com/terraform-yacloud-modules/terraform-yandex-instance-group/pull/112))
+
 ## v1.44.0 - 2026-11-07
 ### Miscellaneous
 - 89aaf97 build(deps): bump actions/checkout from 6 to 7 ([#110](https://github.com/terraform-yacloud-modules/terraform-yandex-instance-group/pull/110))
