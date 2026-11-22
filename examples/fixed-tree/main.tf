@@ -27,9 +27,9 @@ module "network" {
     repo = "terraform-yacloud-modules/terraform-yandex-vpc"
   }
 
-  azs = ["ru-central1-a", "ru-central1-b", "ru-central1-d"]
+  azs = ["ru-central1-d"]
 
-  private_subnets = [["10.4.0.0/24"], ["10.5.0.0/24"], ["10.6.0.0/24"]]
+  private_subnets = [["10.6.0.0/24"]]
 
   create_vpc         = true
   create_nat_gateway = true
@@ -38,12 +38,12 @@ module "network" {
 module "yandex_compute_instance" {
   source = "../../"
 
-  zones = ["ru-central1-a", "ru-central1-b", "ru-central1-d"]
+  zones = ["ru-central1-d"]
 
   name = "example-instance-group"
 
   network_id = module.network.vpc_id
-  subnet_ids = [module.network.private_subnets_ids[0], module.network.private_subnets_ids[1], module.network.private_subnets_ids[2]]
+  subnet_ids = [module.network.private_subnets_ids[0]]
   enable_nat = true
 
   scale = {
