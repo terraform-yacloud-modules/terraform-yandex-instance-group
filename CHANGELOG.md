@@ -1,3 +1,7 @@
+## v1.46.0 - 2026-11-22
+### Bug Fixes
+- 8c74ef9 fix(examples): use available zone in fixed-tree example ([#111](https://github.com/terraform-yacloud-modules/terraform-yandex-instance-group/pull/111))
+
 ## v1.45.0 - 2026-11-18
 ### Miscellaneous
 - 9ae3a2b ci: run semver job only on push to main ([#112](https://github.com/terraform-yacloud-modules/terraform-yandex-instance-group/pull/112))
